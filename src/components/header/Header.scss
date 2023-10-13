@@ -1,0 +1,19 @@
+.header {
+  width: 100%;
+  position: fixed;
+  background: transparent;
+  color: #fff;
+
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+  font-size: 3rem;
+  font-weight: 600;
+
+  & a {
+    color: inherit;
+  }
+  .sign-out {
+    cursor: pointer;
+  }
+}

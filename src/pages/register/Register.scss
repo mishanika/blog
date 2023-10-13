@@ -1,0 +1,78 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  background-image: url("../../assets/jpg/wallpaper.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: #fff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.register-form {
+  width: 600px;
+  height: 700px;
+  border-radius: 1rem;
+  border: 1px solid #fff;
+  backdrop-filter: blur(5px);
+  padding: 75px;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+.title {
+  font-size: 3rem;
+  font-weight: 600;
+}
+.input-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  font-size: 1.5rem;
+
+  & input {
+    background: transparent;
+    color: #fff;
+    font-size: inherit;
+    flex-grow: 1;
+  }
+  & svg {
+    fill: #fff;
+  }
+  & div {
+    width: 100%;
+    display: flex;
+    border-bottom: 1px solid #fff;
+    padding: 0 0 15px 0;
+  }
+  & span {
+    display: block;
+    transform: translateY(calc(15px + 28px));
+  }
+}
+.submit {
+  width: 100%;
+  border: none;
+  background: #fff;
+  font-size: 1.5rem;
+  padding: 15px 0;
+  border-radius: 1rem;
+  transition: all ease 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    -webkit-box-shadow: 0px 0px 18px 0px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 18px 0px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 18px 0px rgba(0, 0, 0, 0.75);
+  }
+}
+.redirect {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+}
