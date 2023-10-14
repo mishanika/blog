@@ -1,3 +1,7 @@
+export type Data = {
+  users: User[];
+  posts: Post[];
+};
 export type User = {
   id: number;
   photo: string;
@@ -29,6 +33,7 @@ export type ProfileBody = {
   token: string;
 };
 export type ProfileInfo = {
+  photo: string;
   username: string;
   name: string;
   status: string;
@@ -41,4 +46,39 @@ export type EditBody = {
   status: string;
   description: string;
   oldUsername: string;
+  accessToken: string;
+};
+export type Post = {
+  id: number;
+  title: string;
+  image: string;
+  text: string;
+  publisherPhoto: string;
+  publisherUsername: string;
+  comments: Comment[];
+  commentsCounter: number;
+};
+export type Posts = {
+  posts: Post[];
+};
+export type PostBody = {
+  text: string;
+  title: string;
+  accessToken: string;
+};
+export type Comment = {
+  id: number;
+  publisherPhoto: string;
+  publisherUsername: string;
+  text: string;
+  replies: Comment[];
+};
+export type Comments = {
+  comments: Comment[];
+};
+export type CommentBody = {
+  commentReplyId: number | null;
+  text: string;
+  accessToken: string;
+  postId: number;
 };

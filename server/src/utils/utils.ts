@@ -1,5 +1,6 @@
+import { Comment, Comments } from "./../types";
 import fs from "fs";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { Users } from "../types";
 
 const SECRET = "VERYSECRETSECRET";
@@ -29,15 +30,45 @@ export const makeTokens = (username: string, id: number) => {
   return { accessToken: accessToken, refreshToken: refreshToken };
 };
 
-export const verify = (token: string | undefined) => {
-  if (token) {
-    const tokenVerify = jwt.verify(token, SECRET);
-    const tokenDecode = jwt.decode(token) as Payload;
-    // console.log("verify", tokenVerify);
-    // console.log("decode", tokenDecode);
-    if (tokenDecode) {
-      return tokenDecode.exp > Date.now() / 1000 && tokenVerify;
+export const verify = async (token: string | undefined) => {
+  try {
+    if (token) {
+      const tokenVerify = jwt.verify(token, SECRET);
+      const tokenDecode = jwt.decode(token) as Payload;
+
+      if (tokenDecode) {
+        console.log("try", tokenDecode.exp > Date.now() / 1000);
+        return tokenDecode.exp > Date.now() / 1000;
+      }
     }
+  } catch (err) {
+    if (err instanceof TokenExpiredError) {
+      if (token) {
+        const tokenDecode = jwt.decode(token) as Payload;
+        const db = (await readFile("src/database/database.json")) as string;
+        let data: Users = JSON.parse(db);
+        const userId: number = data.users.findIndex((user) => user.id === tokenDecode.id);
+        const refreshToken = data.users[userId].refreshToken;
+        let refreshTokenDecode;
+        if (refreshToken) {
+          refreshTokenDecode = jwt.decode(refreshToken) as Payload;
+          if (refreshTokenDecode.exp < Date.now() / 1000) {
+            return false;
+          }
+        }
+
+        const tokens = makeTokens(tokenDecode.username, tokenDecode.id);
+
+        data.users[userId].accessToken = tokens.accessToken;
+        data.users[userId].refreshToken = tokens.refreshToken;
+
+        await writeFile("src/database/database.json", JSON.stringify(data));
+
+        return true;
+      }
+    }
+
+    return false;
   }
 };
 
@@ -59,9 +90,15 @@ export const readFile = async (path: string) => {
     });
   });
 };
-// export const refresh = (accessToken: string, refreshToken: string) => {
-//   const tokenVerify = jwt.verify(accessToken, SECRET);
-//   const tokenDecode = jwt.decode(accessToken) as Payload;
-//   const db = fs.readFileSync("src/database/database.json", "utf8");
 
-// };
+export const addComment = (id: number, comments: Comment[], comment: Comment) => {
+  for (const com of comments) {
+    if (com.id === id) {
+      com.replies.push(comment);
+
+      return;
+    } else if (com.replies.length) {
+      addComment(id, com.replies, comment);
+    }
+  }
+};

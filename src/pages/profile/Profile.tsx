@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth } from "../../utils/utils";
-//import jwt from "jsonwebtoken";
 import "./Profile.scss";
-import ProfilePopup from "../../components/popup/ProfilePopup";
+import ProfilePopup from "../../components/profilePopup/ProfilePopup";
 
 export type ProfileInfo = {
   photo: string;

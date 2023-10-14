@@ -16,7 +16,7 @@ const Header = () => {
       <Link to="/">Blog</Link>
       <Link to={!username ? "/" : `/profile/${username}`}>Profile</Link>
 
-      {username ? (
+      {username && username.length ? (
         <div className="sign-out" onClick={() => signOut()}>
           Sign out
         </div>

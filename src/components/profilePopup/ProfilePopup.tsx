@@ -42,6 +42,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
       status: statusRef.current?.value,
       description: descriptionRef.current?.value,
       oldUsername: username,
+      accessToken: localStorage.getItem("accessToken"),
     };
     if (formRef.current) {
       //accessToken

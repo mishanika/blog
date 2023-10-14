@@ -1,0 +1,38 @@
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 10px 0;
+
+  .publisher-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .publisher-photo {
+    width: 50px;
+    height: 50px;
+
+    & img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
+  //   .comment-text {
+  //     margin: 0 0 25px 0;
+  //   }
+  .reply {
+    font-weight: 600;
+    //margin: 0 0 25px 0;
+    cursor: pointer;
+  }
+  .replies {
+    margin: 0 0 0 25px;
+  }
+  .close-open-replies {
+    display: block;
+    margin: 0 0 25px 0;
+    cursor: pointer;
+  }
+}
