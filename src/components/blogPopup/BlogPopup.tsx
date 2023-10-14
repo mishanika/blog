@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import "./BlogPopup.scss";
-import { ProfileInfo } from "../../pages/profile/Profile";
 import { PostType } from "../../pages/blog/Blog";
 import { useNavigate } from "react-router-dom";
 

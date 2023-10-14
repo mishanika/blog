@@ -1,5 +1,4 @@
 import cors from "cors";
-import fs from "fs";
 import crypto from "crypto";
 import express, { Request, Response } from "express";
 import multer from "multer";
@@ -10,7 +9,6 @@ import {
   EditBody,
   LoginBody,
   PostBody,
-  Posts,
   ProfileBody,
   ProfileInfo,
   RegisterBody,
@@ -41,12 +39,11 @@ app.use(express.json());
 app.use(cors(corsOptions));
 
 app.post("/register", async (req: Request, res: Response) => {
-  const { username, password, repeatedPassword }: RegisterBody = req.body;
+  const { username, password }: RegisterBody = req.body;
   const db = (await readFile("src/database/database.json")) as string;
   let data: Users = JSON.parse(db);
 
   const user: User | undefined = data.users.find((user) => user.username === username);
-  //check password
 
   if (!user) {
     data.users.push({

@@ -1,8 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate, redirect } from "react-router-dom";
+import { useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./Register.scss";
 import Eye from "../../assets/svg/Eye";
-import { auth } from "../../utils/utils";
 
 type Data = {
   username: string;
@@ -78,10 +77,6 @@ const Register: React.FC = () => {
     }
     navigate("/login");
   };
-
-  // useEffect(() => {
-  //   auth(navigate, "/");
-  // }, []);
 
   return (
     <div className="wrapper">

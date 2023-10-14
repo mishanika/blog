@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.scss";
-import { auth } from "../../utils/utils";
 
 type Data = {
   username: string;
@@ -45,10 +44,6 @@ const Login: React.FC = () => {
     localStorage.setItem("username", data.username);
     navigate("/");
   };
-
-  // useEffect(() => {
-  //   auth(navigate, "/");
-  // }, []);
 
   return (
     <div className="wrapper">

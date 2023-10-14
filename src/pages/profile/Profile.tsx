@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { auth } from "../../utils/utils";
 import "./Profile.scss";
 import ProfilePopup from "../../components/profilePopup/ProfilePopup";
 
@@ -13,42 +12,16 @@ export type ProfileInfo = {
   myUsername: string;
 };
 
-type Payload = {
-  id: number;
-  username: string;
-  exp: number;
-};
-
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { username } = useParams();
   const [profileInfo, setProfileInfo] = useState<ProfileInfo>();
   const [popupIsOpen, setPopupIsOpen] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(false);
-  //const [isfirstFullfield, setIsFirstFullfield] = useState<boolean>(false);
-
-  // const decodeToken = () => {
-  //   const token = localStorage.getItem("accessToken");
-  //   if (token !== null) {
-  //     const { username } = jwt.decode(token) as Payload;
-  //     return username;
-  //   }
-  // };
 
   useEffect(() => {
     setIsFetching(true);
   }, []);
-
-  // useEffect(() => {
-  //   if (ifFetching) {
-  //     console.log("useEffect");
-
-  //     auth(navigate);
-
-  //     setIsFetching(false);
-  //     setIsFirstFullfield(true);
-  //   }
-  // }, [ifFetching]);
 
   useEffect(() => {
     if (isFetching) {

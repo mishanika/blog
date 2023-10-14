@@ -45,7 +45,6 @@ const ProfilePopup: React.FC<PopupProps> = ({
       accessToken: localStorage.getItem("accessToken"),
     };
     if (formRef.current) {
-      //accessToken
       const form = new FormData();
 
       for (const [key, value] of Object.entries(data)) {

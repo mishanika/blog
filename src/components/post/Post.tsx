@@ -1,5 +1,5 @@
 import "./Post.scss";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CommentType, PostType as PostProps } from "../../pages/blog/Blog";
 import Comment from "../comment/Comment";
 import { Link } from "react-router-dom";
