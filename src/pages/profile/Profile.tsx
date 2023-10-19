@@ -21,7 +21,7 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     setIsFetching(true);
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     if (isFetching) {
@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
         navigate("/login");
         return;
       }
-      fetch("http://localhost:3030/profile", {
+      fetch("http://localhost:3030/user/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=utf-8",
@@ -44,7 +44,7 @@ const Profile: React.FC = () => {
           setIsFetching(false);
         });
     }
-  }, [isFetching]);
+  }, [username, isFetching]);
 
   return (
     <>

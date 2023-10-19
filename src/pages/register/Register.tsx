@@ -62,7 +62,7 @@ const Register: React.FC = () => {
       repeatedPassword: data.repeatedPassword,
     };
 
-    const response = await fetch("http://localhost:3030/register", {
+    const response = await fetch("http://localhost:3030/user/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",

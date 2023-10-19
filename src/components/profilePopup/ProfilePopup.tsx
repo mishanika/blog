@@ -37,7 +37,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
   const edit = () => {
     const data = {
       photo: photoRef.current?.files,
-      username: usernameRef.current?.value,
+      username: usernameRef.current?.value.length ? nameRef.current?.value : username,
       name: nameRef.current?.value,
       status: statusRef.current?.value,
       description: descriptionRef.current?.value,
@@ -59,7 +59,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
       }
       console.log(formRef.current);
 
-      fetch("http://localhost:3030/edit", {
+      fetch("http://localhost:3030/user/edit", {
         method: "POST",
 
         body: form,

@@ -36,11 +36,11 @@ const Blog = () => {
   useEffect(() => {
     if (isFetching) {
       auth(navigate)
-        .then(() => fetch("http://localhost:3030/posts"))
+        .then(() => fetch("http://localhost:3030/post"))
         .then((data) => data.json())
         .then((data) => {
           setIsFetching(false);
-          setPosts((prev) => [...prev, ...data.posts]);
+          setPosts([...data.posts]);
         });
     }
   }, [isFetching]);
