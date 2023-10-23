@@ -6,7 +6,7 @@ export const storage = multer.diskStorage({
     cb(null, "photos/");
   },
   filename: function (req, file, cb) {
-    cb(null, crypto.randomUUID());
+    cb(null, crypto.randomUUID() + "." + file.mimetype.split("/")[1]);
   },
 });
 export const upload = multer({

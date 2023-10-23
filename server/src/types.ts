@@ -3,7 +3,7 @@ export type Data = {
   posts: Post[];
 };
 export type User = {
-  id: number;
+  id: string;
   photo: string;
   username: string;
   password: string;

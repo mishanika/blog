@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.scss";
 import Eye from "../../assets/svg/Eye";
@@ -23,6 +23,7 @@ const Register: React.FC = () => {
     password: "",
     repeatedPassword: "",
   });
+  const [isFetching, setIsFetching] = useState<boolean>(false);
 
   const showPassword = (
     setIsPasswordShown: React.Dispatch<React.SetStateAction<boolean>>,
@@ -38,9 +39,7 @@ const Register: React.FC = () => {
     setIsPasswordShown((prev) => !prev);
   };
 
-  const register = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const register = async () => {
     let errorFlag = false;
     if (data.password.length < 5) {
       labelPassRef.current!.textContent = "Password must contain more than 5 characters";
@@ -78,9 +77,20 @@ const Register: React.FC = () => {
     navigate("/login");
   };
 
+  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsFetching(true);
+  };
+
+  useEffect(() => {
+    if (isFetching) {
+      register().then(() => setIsFetching(false));
+    }
+  }, [isFetching]);
+
   return (
     <div className="wrapper">
-      <form className="register-form" onSubmit={(e) => register(e)}>
+      <form className="register-form" onSubmit={(e) => submitHandler(e)}>
         <div className="title">Register</div>
         <div className="input-wrapper">
           <label htmlFor="username" className="username-label" ref={labelUsernameRef}>

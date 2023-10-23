@@ -1,7 +1,6 @@
 import cors from "cors";
 import express from "express";
 import router from "./routes/index";
-import multer from "multer";
 
 const app = express();
 const port = 3030;

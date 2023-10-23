@@ -1,16 +1,21 @@
-import { Tokens, decode, makeTokens, readFile, verify, writeFile } from "../utils/utils";
+import { Tokens, decode, makeTokens, readFile, unlinkFile, verify, writeFile } from "../utils/utils";
 import { ProfileInfo, User, Users } from "../types";
-
+import { bucket, database } from "../firebase/firebase";
+import { v4 as uuid } from "uuid";
+import process from "process";
 class UserService {
   registerUser = async (username: string, password: string): Promise<boolean> => {
-    const db = (await readFile("src/database/database.json")) as string;
-    let data: Users = JSON.parse(db);
+    const usersRef = database.collection("users");
+    const existedUser = (await usersRef.where("username", "==", username).get()).size;
+    //const db = (await readFile("src/database/database.json")) as string;
+    //let data: Users = JSON.parse(db);
 
-    const user: User | undefined = data.users.find((user) => user.username === username);
+    //const user: User | undefined = data.users.find((user) => user.username === username);
 
-    if (!user) {
-      data.users.push({
-        id: data.users.length,
+    if (!existedUser) {
+      const id = uuid();
+      usersRef.doc(id).set({
+        id: id,
         photo: "",
         username: username,
         password: password,
@@ -20,7 +25,18 @@ class UserService {
         accessToken: "",
         refreshToken: "",
       });
-      await writeFile("src/database/database.json", JSON.stringify(data));
+      // data.users.push({
+      //   id: data.users.length,
+      //   photo: "",
+      //   username: username,
+      //   password: password,
+      //   name: "",
+      //   status: "",
+      //   description: "",
+      //   accessToken: "",
+      //   refreshToken: "",
+      // });
+      //await writeFile("src/database/database.json", JSON.stringify(data));
 
       return true;
     }
@@ -32,40 +48,48 @@ class UserService {
     username: string,
     password: string
   ): Promise<{ isLogin: boolean; accessToken: string; username: string }> => {
-    const db = (await readFile("src/database/database.json")) as string;
-    let data: Users = JSON.parse(db);
+    //const db = (await readFile("src/database/database.json")) as string;
+    //let data: Users = JSON.parse(db);
 
-    const userId: number = data.users.findIndex((user) => user.username === username && user.password === password);
+    const usersRef = database.collection("users");
+    const user = (await usersRef.where("username", "==", username).get()).docs.map((data) => data.data()) as User[];
+    //const userId: number = data.users.findIndex((user) => user.username === username && user.password === password);
 
-    if (userId !== -1) {
-      const { accessToken, refreshToken }: Tokens = makeTokens(data.users[userId].username, data.users[userId].id);
+    if (user[0]) {
+      const { accessToken, refreshToken }: Tokens = makeTokens(user[0].username, user[0].id);
 
-      data.users[userId].accessToken = accessToken;
-      data.users[userId].refreshToken = refreshToken;
-      await writeFile("src/database/database.json", JSON.stringify(data));
+      user[0].accessToken = accessToken;
+      user[0].refreshToken = refreshToken;
+      //await writeFile("src/database/database.json", JSON.stringify(data));
+      usersRef.doc(user[0].id).set({
+        ...user[0],
+      });
 
-      return { isLogin: true, accessToken: accessToken, username: data.users[userId].username };
+      return { isLogin: true, accessToken: accessToken, username: user[0].username };
     }
     return { isLogin: false, accessToken: "", username: "" };
   };
 
   getUserProfile = async (username: string, token: string): Promise<ProfileInfo | boolean> => {
-    let db = (await readFile("src/database/database.json")) as string;
+    //let db = (await readFile("src/database/database.json")) as string;
 
-    let data: Users = JSON.parse(db);
+    //let data: Users = JSON.parse(db);
     const decodedToken = decode(token);
+    const usersRef = database.collection("users");
+    const user = (await usersRef.doc(decodedToken.id).get()).data() as unknown as User;
 
-    const userId: number = data.users.findIndex((user) => user.username === username);
-    if (userId !== -1) {
-      const user: ProfileInfo = {
-        photo: data.users[userId].photo,
-        username: data.users[userId].username,
-        name: data.users[userId].name,
-        status: data.users[userId].status,
-        description: data.users[userId].description,
+    //const userId: number = data.users.findIndex((user) => user.username === username);
+    if (user) {
+      const userInfo: ProfileInfo = {
+        photo: user.photo,
+        username: user.username,
+        name: user.name,
+        status: user.status,
+        description: user.description,
         myUsername: decodedToken.username,
       };
-      return { ...user };
+
+      return { ...userInfo };
     }
     return false;
   };
@@ -79,22 +103,58 @@ class UserService {
     accessToken: string,
     file: Express.Multer.File | undefined
   ): Promise<{ user: User | {}; isUserEdited: boolean }> => {
-    const db = (await readFile("src/database/database.json")) as string;
-    let data: Users = JSON.parse(db);
+    const decodedToken = decode(accessToken);
+    const usersRef = database.collection("users");
+    const user = (await usersRef.doc(decodedToken.id).get()).data() as unknown as User;
+    const secondUser = (await usersRef.where("username", "==", username).get()).docs.map((data) =>
+      data.data()
+    )[0] as User;
 
-    const userId: number = data.users.findIndex((user) => user.username === oldUsername);
-    const secondUserId: number = data.users.findIndex((user) => user.username === username);
     const isAccessVerified = await verify(accessToken);
 
-    if (isAccessVerified && (username === oldUsername || (userId !== -1 && secondUserId === -1))) {
-      data.users[userId].photo = file ? file.filename : data.users[userId].photo;
-      data.users[userId].username = username && username.length ? username : data.users[userId].username;
-      data.users[userId].name = name && name.length ? name : data.users[userId].name;
-      data.users[userId].status = status && status.length ? status : data.users[userId].status;
-      data.users[userId].description = description && description.length ? description : data.users[userId].description;
-      await writeFile("src/database/database.json", JSON.stringify(data));
+    if ((isAccessVerified && username === oldUsername) || (user && secondUser)) {
+      const photoPath = `${process.cwd()}/photos/${file?.filename}`;
 
-      return { isUserEdited: true, user: { ...data.users[userId], refreshToken: "" } };
+      if (file) {
+        const fileUploadOptions = {
+          destination: `userPhoto/${file?.filename}`,
+          metadata: {
+            contentType: file?.mimetype,
+          },
+        };
+        if (user.photo.length) {
+          const url = user.photo;
+          const regex = /\/([^/?]+)\?/;
+
+          await bucket.deleteFiles({
+            prefix: `userPhoto/${url.match(regex)![1]}`,
+          });
+        }
+
+        await bucket.upload(photoPath, fileUploadOptions);
+
+        const photoFile = await bucket.getFiles({ prefix: `userPhoto/${file?.filename}` });
+        const photoURL = await photoFile[0][0]
+          .getSignedUrl({
+            action: "read",
+            expires: "03-09-2491",
+          })
+          .then((data) => data[0]);
+        console.log(photoURL);
+
+        user.photo = photoURL;
+      }
+
+      user.username = username && username.length ? username : user.username;
+      user.name = name && name.length ? name : user.name;
+      user.status = status && status.length ? status : user.status;
+      user.description = description && description.length ? description : user.description;
+
+      await database.collection("users").doc(user.id).update(user);
+
+      unlinkFile(photoPath);
+
+      return { isUserEdited: true, user: { ...user, refreshToken: "" } };
     }
     return { isUserEdited: false, user: {} };
   };

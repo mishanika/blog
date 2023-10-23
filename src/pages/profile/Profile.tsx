@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
       <div className="profile-wrapper">
         <div className="photo-info-wrapper">
           <div className="photo">
-            <img src={`http://localhost:3030/${profileInfo?.photo}`} alt="" />
+            <img src={profileInfo?.photo} alt="" />
           </div>
           <div className="info">
             <div className="username">{profileInfo?.username}</div>

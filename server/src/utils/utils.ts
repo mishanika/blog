@@ -1,7 +1,8 @@
-import { Comment, Comments } from "./../types";
+import { Comment, Comments, User } from "./../types";
 import fs from "fs";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { Users } from "../types";
+import { database } from "../firebase/firebase";
 
 const SECRET = "VERYSECRETSECRET";
 
@@ -11,12 +12,12 @@ export type Tokens = {
 };
 
 export type Payload = {
-  id: number;
+  id: string;
   username: string;
   exp: number;
 };
 
-export const makeTokens = (username: string, id: number) => {
+export const makeTokens = (username: string, id: string) => {
   let accessToken: string | undefined = jwt.sign(
     { id: id, username: username, exp: Math.floor(Date.now() / 1000) + 60 * 60 },
     SECRET,
@@ -44,11 +45,15 @@ export const verify = async (token: string | undefined) => {
   } catch (err) {
     if (err instanceof TokenExpiredError) {
       if (token) {
-        const tokenDecode = jwt.decode(token) as Payload;
-        const db = (await readFile("src/database/database.json")) as string;
-        let data: Users = JSON.parse(db);
-        const userId: number = data.users.findIndex((user) => user.id === tokenDecode.id);
-        const refreshToken = data.users[userId].refreshToken;
+        const decodedToken = jwt.decode(token) as Payload;
+
+        //const db = (await readFile("src/database/database.json")) as string;
+        //let data: Users = JSON.parse(db);
+        //const userId: number = data.users.findIndex((user) => user.id === tokenDecode.id);
+        const usersRef = database.collection("users");
+        const user = (await usersRef.doc(decodedToken.id).get()).data() as unknown as User;
+
+        const refreshToken = user.refreshToken;
         let refreshTokenDecode;
         if (refreshToken) {
           refreshTokenDecode = jwt.decode(refreshToken) as Payload;
@@ -57,12 +62,15 @@ export const verify = async (token: string | undefined) => {
           }
         }
 
-        const tokens = makeTokens(tokenDecode.username, tokenDecode.id);
+        const tokens = makeTokens(decodedToken.username, decodedToken.id);
 
-        data.users[userId].accessToken = tokens.accessToken;
-        data.users[userId].refreshToken = tokens.refreshToken;
+        user.accessToken = tokens.accessToken;
+        user.refreshToken = tokens.refreshToken;
 
-        await writeFile("src/database/database.json", JSON.stringify(data));
+        //await writeFile("src/database/database.json", JSON.stringify(data));
+        usersRef.doc(user.id).set({
+          ...user,
+        });
 
         return true;
       }
@@ -88,6 +96,12 @@ export const readFile = async (path: string) => {
     fs.readFile(path, "utf-8", (err, data) => {
       resolve(data);
     });
+  });
+};
+
+export const unlinkFile = async (path: string) => {
+  return new Promise((resolve) => {
+    fs.unlink(path, resolve);
   });
 };
 
