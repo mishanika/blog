@@ -39,7 +39,7 @@ class PostService {
     const isAccessVerified = await verify(accessToken);
 
     if (isAccessVerified) {
-      let photoURL;
+      let photoURL = "";
 
       if (file) {
         const photoPath = `${process.cwd()}/photos/${file.filename}`;
