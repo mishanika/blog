@@ -1,7 +1,17 @@
 import { bucket, database } from "../firebase/firebase";
 import { CommentBody, Data, Post, User } from "../types";
 import { v4 as uuid } from "uuid";
-import { Payload, Tokens, addComment, decode, makeTokens, readFile, verify, writeFile } from "../utils/utils";
+import {
+  Payload,
+  Tokens,
+  addComment,
+  decode,
+  makeTokens,
+  readFile,
+  unlinkFile,
+  verify,
+  writeFile,
+} from "../utils/utils";
 
 class PostService {
   createPost = async (
@@ -53,6 +63,8 @@ class PostService {
         console.log(photoURL);
 
         user[0].photo = photoURL;
+
+        unlinkFile(photoPath);
       }
 
       const id = uuid();
@@ -140,7 +152,8 @@ class PostService {
       }
       post[0].commentsCounter += 1;
 
-      postsRef.doc(post[0].id).set(post);
+      await postsRef.doc(post[0].id).set({ ...post[0] });
+
       //await writeFile("src/database/database.json", JSON.stringify(data));
 
       return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post[0] } };
