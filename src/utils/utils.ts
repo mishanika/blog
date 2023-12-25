@@ -8,7 +8,7 @@ export const auth = async (navigate: NavigateFunction) => {
     return;
   }
 
-  fetch("http://localhost:3030/auth", {
+  fetch("https://blog-api-3pat.onrender.com/auth", {
     method: "POST",
     headers: {
       "Content-Type": "application/json;charset=utf-8",

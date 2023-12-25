@@ -59,7 +59,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
       }
       console.log(formRef.current);
 
-      fetch("http://localhost:3030/edit", {
+      fetch("https://blog-api-3pat.onrender.com/edit", {
         method: "POST",
 
         body: form,

@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
         navigate("/login");
         return;
       }
-      fetch("http://localhost:3030/profile", {
+      fetch("https://blog-api-3pat.onrender.com/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=utf-8",
@@ -56,7 +56,7 @@ const Profile: React.FC = () => {
       <div className="profile-wrapper">
         <div className="photo-info-wrapper">
           <div className="photo">
-            <img src={`http://localhost:3030/${profileInfo?.photo}`} alt="" />
+            <img src={`https://blog-api-3pat.onrender.com/${profileInfo?.photo}`} alt="" />
           </div>
           <div className="info">
             <div className="username">{profileInfo?.username}</div>

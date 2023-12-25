@@ -41,7 +41,7 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ setIsPopupOpen, setPosts }) => {
       }
     }
 
-    fetch("http://localhost:3030/createPost", {
+    fetch("https://blog-api-3pat.onrender.com/createPost", {
       method: "POST",
 
       body: form,

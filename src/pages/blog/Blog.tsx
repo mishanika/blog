@@ -36,7 +36,7 @@ const Blog = () => {
   useEffect(() => {
     if (isFetching) {
       auth(navigate)
-        .then(() => fetch("http://localhost:3030/posts"))
+        .then(() => fetch("https://blog-api-3pat.onrender.com/posts"))
         .then((data) => data.json())
         .then((data) => {
           setIsFetching(false);

@@ -19,12 +19,12 @@ const Post: React.FC<PostProps> = ({ id, title, image, text, publisherPhoto, pub
         <Link to={`/profile/${publisherUsername}`} className="publisher-wrapper">
           <div className="publisher-name">{publisherUsername}</div>
           <div className="publisher-photo">
-            <img src={`http://localhost:3030/${publisherPhoto}`} alt="post" className="post-img" />
+            <img src={`https://blog-api-3pat.onrender.com/${publisherPhoto}`} alt="post" className="post-img" />
           </div>
         </Link>
       </div>
       <div className="image">
-        <img src={`http://localhost:3030/${image}`} alt="post" className="post-img" />
+        <img src={`https://blog-api-3pat.onrender.com/${image}`} alt="post" className="post-img" />
       </div>
       <div className="text">{text}</div>
       <PostContext.Provider value={{ postId: id }}>
