@@ -11,6 +11,7 @@ class UserRouter {
 
   getRouter() {
     const router = express.Router();
+    router.route("/").get(this.userController.getUsersTest);
     router.route("/register").post(this.userController.registerUser);
     router.route("/login").post(this.userController.loginUser);
     router.route("/auth").post(this.userController.authUser);
