@@ -38,7 +38,6 @@ const ProfilePopup: React.FC<PopupProps> = ({
   const edit = () => {
     const data = {
       photo: photoRef.current?.files,
-      photoURL: photo ? photo : "",
       username: usernameRef.current?.value ? usernameRef.current?.value : "",
       name: nameRef.current?.value ? nameRef.current?.value : "",
       status: statusRef.current?.value ? statusRef.current?.value : "",
