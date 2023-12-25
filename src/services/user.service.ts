@@ -143,16 +143,18 @@ class UserService {
         console.log(photoURL);
 
         user.photo = photoURL;
+        unlinkFile(photoPath);
       }
 
       user.username = username && username.length ? username : user.username;
       user.name = name && name.length ? name : user.name;
       user.status = status && status.length ? status : user.status;
       user.description = description && description.length ? description : user.description;
+      user.photo = user.photo ? user.photo : "";
+
+      console.log(user);
 
       await database.collection("users").doc(user.id).update(user);
-
-      unlinkFile(photoPath);
 
       return { isUserEdited: true, user: { ...user, refreshToken: "" } };
     }

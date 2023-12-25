@@ -76,6 +76,7 @@ class PostService {
         comments: [],
         commentsCounter: 0,
       };
+      console.log(post);
       postsRef.doc(id).set(post);
 
       // const payload: Payload = decode(accessToken);
