@@ -62,16 +62,14 @@ class PostService {
           .then((data) => data[0]);
         console.log(photoURL);
 
-        user[0].photo = photoURL;
-
         unlinkFile(photoPath);
       }
 
       const id = uuid();
       const post = {
         id: id,
-        title: title,
-        text: text,
+        title: title ? title : "",
+        text: text ? text : "",
         image: photoURL,
         publisherPhoto: user[0].photo,
         publisherUsername: user[0].username,
