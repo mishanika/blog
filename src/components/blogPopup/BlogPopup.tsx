@@ -23,8 +23,8 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ setIsPopupOpen, setPosts }) => {
   const createPost = () => {
     const data = {
       photo: photoRef.current?.files,
-      title: titleRef.current?.value,
-      text: textRef.current?.value,
+      title: titleRef.current?.value ? titleRef.current?.value : "",
+      text: textRef.current?.value ? titleRef.current?.value : "",
       accessToken: localStorage.getItem("accessToken"),
     };
     //accessToken
