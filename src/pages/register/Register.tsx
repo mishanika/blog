@@ -62,7 +62,7 @@ const Register: React.FC = () => {
       repeatedPassword: data.repeatedPassword,
     };
 
-    const response = await fetch("https://blog-api-3pat.onrender.com/register", {
+    const response = await fetch("https://blog-api-3pat.onrender.com/user/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",

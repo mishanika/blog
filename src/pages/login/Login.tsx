@@ -25,7 +25,7 @@ const Login: React.FC = () => {
       password: data.password,
     };
 
-    const response = await fetch("https://blog-api-3pat.onrender.com/login", {
+    const response = await fetch("https://blog-api-3pat.onrender.com/user/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",

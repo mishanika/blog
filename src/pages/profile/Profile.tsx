@@ -30,7 +30,7 @@ const Profile: React.FC = () => {
         navigate("/login");
         return;
       }
-      fetch("https://blog-api-3pat.onrender.com/profile", {
+      fetch("https://blog-api-3pat.onrender.com/user/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=utf-8",

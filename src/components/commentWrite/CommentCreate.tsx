@@ -23,7 +23,7 @@ const CommentCreate: React.FC<CommentCreateProps> = ({ comments, commentReplyId 
       commentReplyId: commentReplyId,
     };
 
-    fetch("https://blog-api-3pat.onrender.com/createComment", {
+    fetch("https://blog-api-3pat.onrender.com/post/createComment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
