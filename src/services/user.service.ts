@@ -76,7 +76,7 @@ class UserService {
     //let data: Users = JSON.parse(db);
     const decodedToken = decode(token);
     const usersRef = database.collection("users");
-    const user = (await usersRef.doc(decodedToken.id).get()).data() as unknown as User;
+    const user = (await usersRef.where("username", "==", username).get()).docs[0].data() as unknown as User;
 
     //const userId: number = data.users.findIndex((user) => user.username === username);
     if (user) {
