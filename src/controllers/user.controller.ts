@@ -9,10 +9,6 @@ class UserController {
     this.userService = userService;
   }
 
-  getUsersTest = async (req: Request, res: Response) => {
-    res.status(200).send("HELLO");
-  };
-
   registerUser = async (req: Request, res: Response) => {
     const { username, password }: RegisterBody = req.body;
     const isRegistered = await this.userService.registerUser(username, password);

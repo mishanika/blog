@@ -55,7 +55,7 @@ class UserService {
     const user = (await usersRef.where("username", "==", username).get()).docs.map((data) => data.data()) as User[];
     //const userId: number = data.users.findIndex((user) => user.username === username && user.password === password);
 
-    if (user[0]) {
+    if (user[0].password === password) {
       const { accessToken, refreshToken }: Tokens = makeTokens(user[0].username, user[0].id);
 
       user[0].accessToken = accessToken;

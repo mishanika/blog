@@ -1,4 +1,6 @@
-import { CommentBody, Data, Post } from "../types";
+import { bucket, database } from "../firebase/firebase";
+import { CommentBody, Data, Post, User } from "../types";
+import { v4 as uuid } from "uuid";
 import { Payload, Tokens, addComment, decode, makeTokens, readFile, verify, writeFile } from "../utils/utils";
 
 class PostService {
@@ -12,38 +14,89 @@ class PostService {
     accessToken: string | undefined;
     post: Post | {};
   }> => {
-    const db = (await readFile("src/database/database.json")) as string;
-    let data: Data = JSON.parse(db);
+    const postsRef = database.collection("posts");
+    const usersRef = database.collection("users");
+
+    const payload: Payload = decode(accessToken);
+
+    const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
+      user.data()
+    ) as User[];
+
+    // const db = (await readFile("src/database/database.json")) as string;
+    // let data: Data = JSON.parse(db);
 
     const isAccessVerified = await verify(accessToken);
 
     if (isAccessVerified) {
-      const payload: Payload = decode(accessToken);
-      const userId: number = data.users.findIndex((user) => user.username === payload.username);
-      const img = file ? file.filename : "";
+      let photoURL;
+
+      if (file) {
+        const photoPath = `${process.cwd()}/photos/${file.filename}`;
+
+        const fileUploadOptions = {
+          destination: `postPhoto/${file?.filename}`,
+          metadata: {
+            contentType: file?.mimetype,
+          },
+        };
+
+        await bucket.upload(photoPath, fileUploadOptions);
+
+        const photoFile = await bucket.getFiles({ prefix: `postPhoto/${file?.filename}` });
+        photoURL = await photoFile[0][0]
+          .getSignedUrl({
+            action: "read",
+            expires: "03-09-2491",
+          })
+          .then((data) => data[0]);
+        console.log(photoURL);
+
+        user[0].photo = photoURL;
+      }
+
+      const id = uuid();
       const post = {
-        id: data.posts.length,
+        id: id,
         title: title,
         text: text,
-        image: img,
-        publisherPhoto: data.users[userId].photo,
-        publisherUsername: data.users[userId].username,
+        image: photoURL,
+        publisherPhoto: user[0].photo,
+        publisherUsername: user[0].username,
         comments: [],
         commentsCounter: 0,
       };
-      data.posts.push(post);
-      await writeFile("src/database/database.json", JSON.stringify(data));
+      postsRef.doc(id).set(post);
 
-      return { isPostCreated: true, accessToken: data.users[userId].accessToken, post: { ...post } };
+      // const payload: Payload = decode(accessToken);
+      // const userId: number = data.users.findIndex((user) => user.username === payload.username);
+      // const img = file ? file.filename : "";
+      // const post = {
+      //   id: data.posts.length,
+      //   title: title,
+      //   text: text,
+      //   image: img,
+      //   publisherPhoto: data.users[userId].photo,
+      //   publisherUsername: data.users[userId].username,
+      //   comments: [],
+      //   commentsCounter: 0,
+      // };
+      // data.posts.push(post);
+      // await writeFile("src/database/database.json", JSON.stringify(data));
+
+      return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post } };
     }
     return { isPostCreated: false, accessToken: "", post: {} };
   };
 
   getPosts = async () => {
-    const db = (await readFile("src/database/database.json")) as string;
-    let data: Data = JSON.parse(db);
+    const postsRef = database.collection("posts");
+    const posts = (await postsRef.get()).docs.map((post) => post.data());
 
-    return data.posts;
+    // const db = (await readFile("src/database/database.json")) as string;
+    // let data: Data = JSON.parse(db);
+
+    return posts;
   };
 
   createComment = async ({
@@ -56,34 +109,41 @@ class PostService {
     accessToken: string | undefined;
     post: Post | {};
   }> => {
-    const db = (await readFile("src/database/database.json")) as string;
-    let data: Data = JSON.parse(db);
+    // const db = (await readFile("src/database/database.json")) as string;
+    // let data: Data = JSON.parse(db);
+    const postsRef = database.collection("posts");
+    const usersRef = database.collection("users");
 
     const isAccessVerified = await verify(accessToken);
 
     if (isAccessVerified) {
-      const postIdInner = data.posts.findIndex((post) => post.id === postId);
       const payload: Payload = decode(accessToken);
-      const userId = data.users.findIndex((user) => user.username === payload.username);
+      const post = (await postsRef.where("id", "==", postId).get()).docs.map((post) => post.data()) as Post[];
+      //const postIdInner = data.posts.findIndex((post) => post.id === postId);
+      const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
+        user.data()
+      ) as User[];
+      //const userId = data.users.findIndex((user) => user.username === payload.username);
 
       const comment = {
-        id: data.posts[postIdInner].commentsCounter,
-        publisherPhoto: data.users[userId].photo,
-        publisherUsername: payload.username,
+        id: post[0].commentsCounter,
+        publisherPhoto: user[0].photo,
+        publisherUsername: user[0].username,
         text: text,
         replies: [],
       };
 
       if (commentReplyId === null) {
-        data.posts[postIdInner].comments.push(comment);
+        post[0].comments.push(comment);
       } else {
-        addComment(commentReplyId, data.posts[postIdInner].comments, comment);
+        addComment(commentReplyId, post[0].comments, comment);
       }
-      data.posts[postIdInner].commentsCounter += 1;
+      post[0].commentsCounter += 1;
 
-      await writeFile("src/database/database.json", JSON.stringify(data));
+      postsRef.doc(post[0].id).set(post);
+      //await writeFile("src/database/database.json", JSON.stringify(data));
 
-      return { isPostCreated: true, accessToken: data.users[userId].accessToken, post: { ...data.posts[postIdInner] } };
+      return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post[0] } };
     }
     return { isPostCreated: false, accessToken: "", post: {} };
   };
