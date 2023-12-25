@@ -10,7 +10,7 @@ const port = 3030;
 
 app.use(express.static("photos"));
 app.use(express.json());
-//app.use(cors(corsOptions));
+app.use(cors());
 app.use(router);
 
 app.listen(port, () => {
