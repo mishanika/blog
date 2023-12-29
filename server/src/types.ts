@@ -49,7 +49,7 @@ export type EditBody = {
   accessToken: string;
 };
 export type Post = {
-  id: number;
+  id: string;
   title: string;
   image: string;
   text: string;

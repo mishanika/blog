@@ -55,7 +55,7 @@ class UserService {
     const user = (await usersRef.where("username", "==", username).get()).docs.map((data) => data.data()) as User[];
     //const userId: number = data.users.findIndex((user) => user.username === username && user.password === password);
 
-    if (user[0]) {
+    if (user[0].password === password) {
       const { accessToken, refreshToken }: Tokens = makeTokens(user[0].username, user[0].id);
 
       user[0].accessToken = accessToken;
@@ -76,7 +76,7 @@ class UserService {
     //let data: Users = JSON.parse(db);
     const decodedToken = decode(token);
     const usersRef = database.collection("users");
-    const user = (await usersRef.doc(decodedToken.id).get()).data() as unknown as User;
+    const user = (await usersRef.where("username", "==", username).get()).docs[0].data() as unknown as User;
 
     //const userId: number = data.users.findIndex((user) => user.username === username);
     if (user) {
@@ -143,16 +143,18 @@ class UserService {
         console.log(photoURL);
 
         user.photo = photoURL;
+        unlinkFile(photoPath);
       }
 
       user.username = username && username.length ? username : user.username;
       user.name = name && name.length ? name : user.name;
       user.status = status && status.length ? status : user.status;
       user.description = description && description.length ? description : user.description;
+      user.photo = user.photo ? user.photo : "";
+
+      console.log(user);
 
       await database.collection("users").doc(user.id).update(user);
-
-      unlinkFile(photoPath);
 
       return { isUserEdited: true, user: { ...user, refreshToken: "" } };
     }
