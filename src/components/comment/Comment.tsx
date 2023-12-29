@@ -14,7 +14,7 @@ const Comment: React.FC<CommentProps> = ({ id, publisherPhoto, publisherUsername
       <div className="publisher-wrapper">
         <div className="publisher-photo">
           {publisherPhoto.length ? (
-            <img src={`http://localhost:3030/${publisherPhoto}`} alt="comment-photo" className="comment-img" />
+            <img src={`${publisherPhoto}`} alt="comment-photo" className="comment-img" />
           ) : (
             false
           )}

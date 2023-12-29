@@ -16,6 +16,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
   username,
   name,
   status,
+  photo,
   description,
   setPopupIsOpen,
   setProfileInfo,
@@ -37,13 +38,14 @@ const ProfilePopup: React.FC<PopupProps> = ({
   const edit = () => {
     const data = {
       photo: photoRef.current?.files,
-      username: usernameRef.current?.value.length ? nameRef.current?.value : username,
-      name: nameRef.current?.value,
-      status: statusRef.current?.value,
-      description: descriptionRef.current?.value,
+      username: usernameRef.current?.value ? usernameRef.current?.value : username,
+      name: nameRef.current?.value ? nameRef.current?.value : "",
+      status: statusRef.current?.value ? statusRef.current?.value : "",
+      description: descriptionRef.current?.value ? descriptionRef.current?.value : "",
       oldUsername: username,
       accessToken: localStorage.getItem("accessToken"),
     };
+
     if (formRef.current) {
       const form = new FormData();
 
