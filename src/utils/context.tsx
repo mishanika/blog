@@ -9,5 +9,5 @@ export interface IBlogContext {
   setPosts: React.Dispatch<React.SetStateAction<PostType[]>>;
 }
 export interface IPostContext {
-  postId: number;
+  postId: string;
 }

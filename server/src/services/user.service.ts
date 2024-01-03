@@ -1,5 +1,5 @@
 import { Tokens, decode, makeTokens, readFile, unlinkFile, verify, writeFile } from "../utils/utils";
-import { ProfileInfo, User, Users } from "../types";
+import { ProfileInfo, User } from "../types";
 import { bucket, database } from "../firebase/firebase";
 import { v4 as uuid } from "uuid";
 import process from "process";
@@ -7,10 +7,6 @@ class UserService {
   registerUser = async (username: string, password: string): Promise<boolean> => {
     const usersRef = database.collection("users");
     const existedUser = (await usersRef.where("username", "==", username).get()).size;
-    //const db = (await readFile("src/database/database.json")) as string;
-    //let data: Users = JSON.parse(db);
-
-    //const user: User | undefined = data.users.find((user) => user.username === username);
 
     if (!existedUser) {
       const id = uuid();
@@ -25,18 +21,6 @@ class UserService {
         accessToken: "",
         refreshToken: "",
       });
-      // data.users.push({
-      //   id: data.users.length,
-      //   photo: "",
-      //   username: username,
-      //   password: password,
-      //   name: "",
-      //   status: "",
-      //   description: "",
-      //   accessToken: "",
-      //   refreshToken: "",
-      // });
-      //await writeFile("src/database/database.json", JSON.stringify(data));
 
       return true;
     }
@@ -48,19 +32,15 @@ class UserService {
     username: string,
     password: string
   ): Promise<{ isLogin: boolean; accessToken: string; username: string }> => {
-    //const db = (await readFile("src/database/database.json")) as string;
-    //let data: Users = JSON.parse(db);
-
     const usersRef = database.collection("users");
     const user = (await usersRef.where("username", "==", username).get()).docs.map((data) => data.data()) as User[];
-    //const userId: number = data.users.findIndex((user) => user.username === username && user.password === password);
 
     if (user[0].password === password) {
       const { accessToken, refreshToken }: Tokens = makeTokens(user[0].username, user[0].id);
 
       user[0].accessToken = accessToken;
       user[0].refreshToken = refreshToken;
-      //await writeFile("src/database/database.json", JSON.stringify(data));
+
       usersRef.doc(user[0].id).set({
         ...user[0],
       });
@@ -71,14 +51,10 @@ class UserService {
   };
 
   getUserProfile = async (username: string, token: string): Promise<ProfileInfo | boolean> => {
-    //let db = (await readFile("src/database/database.json")) as string;
-
-    //let data: Users = JSON.parse(db);
     const decodedToken = decode(token);
     const usersRef = database.collection("users");
     const user = (await usersRef.where("username", "==", username).get()).docs[0].data() as unknown as User;
 
-    //const userId: number = data.users.findIndex((user) => user.username === username);
     if (user) {
       const userInfo: ProfileInfo = {
         photo: user.photo,

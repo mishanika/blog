@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import PostService from "../services/post.service";
-import { CommentBody, PostBody } from "../types";
-import { readFile } from "../utils/utils";
 
 class PostController {
   postService: PostService;
@@ -11,10 +9,9 @@ class PostController {
 
   createPost = async (req: Request, res: Response) => {
     try {
-      const { text, title, accessToken }: PostBody = req.body;
-      const postCreated = await this.postService.createPost(text, title, accessToken, req.file);
+      const postCreated = await this.postService.createPost(req.body);
       if (postCreated.isPostCreated) {
-        res.status(200).json({ auth: true, accessToken: accessToken, post: postCreated.post });
+        res.status(200).json({ auth: true, accessToken: postCreated.accessToken, postId: postCreated.postId });
         return;
       }
 
@@ -36,9 +33,20 @@ class PostController {
     }
   };
 
+  getPost = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const post = await this.postService.getPost(id);
+
+      res.status(200).json({ post: { ...post } });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Server Error");
+    }
+  };
+
   createComment = async (req: Request, res: Response) => {
     try {
-      //const { text, accessToken, postId, commentReplyId }: CommentBody = req.body;
       const commentCreated = await this.postService.createComment(req.body);
       if (commentCreated.isPostCreated) {
         res.status(200).json({ auth: true, accessToken: commentCreated.accessToken, post: commentCreated.post });

@@ -13,9 +13,6 @@ export type User = {
   accessToken: string | undefined;
   refreshToken: string | undefined;
 };
-export type Users = {
-  users: User[];
-};
 export type RegisterBody = {
   username: string;
   password: string;
@@ -58,13 +55,11 @@ export type Post = {
   comments: Comment[];
   commentsCounter: number;
 };
-export type Posts = {
-  posts: Post[];
-};
 export type PostBody = {
-  text: string;
   title: string;
+  elements: PostElement[];
   accessToken: string;
+  date: number;
 };
 export type Comment = {
   id: number;
@@ -73,12 +68,13 @@ export type Comment = {
   text: string;
   replies: Comment[];
 };
-export type Comments = {
-  comments: Comment[];
-};
 export type CommentBody = {
   commentReplyId: number | null;
   text: string;
   accessToken: string;
   postId: number;
+};
+export type PostElement = {
+  element: string;
+  value: string;
 };

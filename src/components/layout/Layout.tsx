@@ -5,6 +5,7 @@ import Header from "../header/Header";
 const Layout = () => {
   return (
     <>
+      <div className="background"></div>
       <Header />
       <Routing />
     </>

@@ -15,7 +15,9 @@ const Post: React.FC<PostProps> = ({ id, title, image, text, publisherPhoto, pub
   return (
     <div className="post">
       <div className="post-top">
-        <div className="title">{title}</div>
+        <Link to={`/post/${id}`}>
+          <div className="title">{title}</div>
+        </Link>
         <Link to={`/profile/${publisherUsername}`} className="publisher-wrapper">
           <div className="publisher-name">{publisherUsername}</div>
           <div className="publisher-photo">
@@ -23,7 +25,7 @@ const Post: React.FC<PostProps> = ({ id, title, image, text, publisherPhoto, pub
           </div>
         </Link>
       </div>
-      <div className="image">
+      {/* <div className="image">
         <img src={`${image}`} alt="post" className="post-img" />
       </div>
       <div className="text">{text}</div>
@@ -48,7 +50,7 @@ const Post: React.FC<PostProps> = ({ id, title, image, text, publisherPhoto, pub
           {isCommentCreateOpen ? <CommentCreate comments={comments} commentReplyId={null} /> : false}
           {!isCommentsOpen ? false : comments.map(commentsRender)}
         </div>
-      </PostContext.Provider>
+      </PostContext.Provider> */}
     </div>
   );
 };

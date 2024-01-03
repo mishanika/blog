@@ -1,7 +1,6 @@
-import { Comment, Comments, User } from "./../types";
+import { Comment, User } from "./../types";
 import fs from "fs";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
-import { Users } from "../types";
 import { database } from "../firebase/firebase";
 
 const SECRET = "VERYSECRETSECRET";
@@ -88,6 +87,12 @@ export const decode = (accessToken: string) => {
 export const writeFile = (path: string, data: any) => {
   return new Promise((resolve) => {
     fs.writeFile(path, data, resolve);
+  });
+};
+
+export const uploadFile = (name: string, data: string) => {
+  return new Promise((resolve) => {
+    fs.writeFile(`${process.cwd()}/photos/${name}`, data, { encoding: "base64" }, resolve);
   });
 };
 

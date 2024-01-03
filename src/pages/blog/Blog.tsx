@@ -1,6 +1,6 @@
 import "./Blog.scss";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../../utils/utils";
 import Post from "../../components/post/Post";
 import BlogPopup from "../../components/blogPopup/BlogPopup";
@@ -52,9 +52,13 @@ const Blog = () => {
       {isPopupOpen ? <BlogPopup setIsPopupOpen={setIsPopupOpen} setPosts={setPosts} /> : false}
       <div className="blog-wrapper">
         <div className="posts-wrapper">
-          <div className="create" onClick={() => setIsPopupOpen(true)}>
+          {/* {<div className="create" onClick={() => setIsPopupOpen(true)}>
             Create new
-          </div>
+          </div>} */}
+          <Link to={`/createPost`} className="create">
+            {" "}
+            Create new
+          </Link>
           <BlogContext.Provider value={{ setPosts: setPosts, posts: posts }}>
             <div className="posts">{posts?.map(postRender)}</div>
           </BlogContext.Provider>

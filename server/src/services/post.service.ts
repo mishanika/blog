@@ -1,113 +1,156 @@
 import { bucket, database } from "../firebase/firebase";
-import { CommentBody, Data, Post, User } from "../types";
+import { CommentBody, Post, PostBody, User } from "../types";
 import { v4 as uuid } from "uuid";
-import {
-  Payload,
-  Tokens,
-  addComment,
-  decode,
-  makeTokens,
-  readFile,
-  unlinkFile,
-  verify,
-  writeFile,
-} from "../utils/utils";
+import { Payload, addComment, decode, unlinkFile, uploadFile, verify } from "../utils/utils";
 
 class PostService {
-  createPost = async (
-    text: string,
-    title: string,
-    accessToken: string,
-    file: Express.Multer.File | undefined
-  ): Promise<{
+  // createPost = async (
+  //   text: string,
+  //   title: string,
+  //   accessToken: string,
+  //   file: Express.Multer.File | undefined
+  // ): Promise<{
+  //   isPostCreated: boolean;
+  //   accessToken: string | undefined;
+  //   post: Post | {};
+  // }> => {
+  //   const postsRef = database.collection("posts");
+  //   const usersRef = database.collection("users");
+
+  //   const payload: Payload = decode(accessToken);
+
+  //   const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
+  //     user.data()
+  //   ) as User[];
+
+  //   const isAccessVerified = await verify(accessToken);
+
+  //   if (isAccessVerified) {
+  //     let photoURL = "";
+
+  //     if (file) {
+  //       const photoPath = `${process.cwd()}/photos/${file.filename}`;
+
+  //       const fileUploadOptions = {
+  //         destination: `postPhoto/${file?.filename}`,
+  //         metadata: {
+  //           contentType: file?.mimetype,
+  //         },
+  //       };
+
+  //       await bucket.upload(photoPath, fileUploadOptions);
+
+  //       const photoFile = await bucket.getFiles({ prefix: `postPhoto/${file?.filename}` });
+  //       photoURL = await photoFile[0][0]
+  //         .getSignedUrl({
+  //           action: "read",
+  //           expires: "03-09-2491",
+  //         })
+  //         .then((data) => data[0]);
+  //       console.log(photoURL);
+
+  //       unlinkFile(photoPath);
+  //     }
+
+  //     const id = uuid();
+  //     const post = {
+  //       id: id,
+  //       title: title ? title : "",
+  //       text: text ? text : "",
+  //       image: photoURL,
+  //       publisherPhoto: user[0].photo,
+  //       publisherUsername: user[0].username,
+  //       comments: [],
+  //       commentsCounter: 0,
+  //     };
+  //     console.log(post);
+  //     postsRef.doc(id).set(post);
+
+  //     return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post } };
+  //   }
+  //   return { isPostCreated: false, accessToken: "", post: {} };
+  // };
+
+  createPost = async ({
+    title,
+    elements,
+    accessToken,
+    date,
+  }: PostBody): Promise<{
     isPostCreated: boolean;
     accessToken: string | undefined;
-    post: Post | {};
+    postId: string;
   }> => {
+    const elems = [...elements];
     const postsRef = database.collection("posts");
     const usersRef = database.collection("users");
-
-    const payload: Payload = decode(accessToken);
-
-    const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
-      user.data()
-    ) as User[];
-
-    // const db = (await readFile("src/database/database.json")) as string;
-    // let data: Data = JSON.parse(db);
 
     const isAccessVerified = await verify(accessToken);
 
     if (isAccessVerified) {
-      let photoURL = "";
+      const payload: Payload = decode(accessToken);
+      const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
+        user.data()
+      ) as User[];
 
-      if (file) {
-        const photoPath = `${process.cwd()}/photos/${file.filename}`;
+      const imgElements = elements.filter((item) => item.element === "img");
 
+      for (let i = 0; i < imgElements.length; i++) {
+        let base64Image = imgElements[i].value.split(";base64,").pop();
+        const name = `${uuid()}.${imgElements[i].value.split(";base64,")[0].split("/")[1]}`;
         const fileUploadOptions = {
-          destination: `postPhoto/${file?.filename}`,
-          metadata: {
-            contentType: file?.mimetype,
-          },
+          destination: `postPhoto/${name}`,
         };
 
-        await bucket.upload(photoPath, fileUploadOptions);
+        await uploadFile(name, base64Image || "");
 
-        const photoFile = await bucket.getFiles({ prefix: `postPhoto/${file?.filename}` });
-        photoURL = await photoFile[0][0]
+        await bucket.upload(`${process.cwd()}/photos/${name}`, fileUploadOptions);
+
+        const photoFile = await bucket.getFiles({ prefix: `postPhoto/${name}` });
+        imgElements[i].value = await photoFile[0][0]
           .getSignedUrl({
             action: "read",
             expires: "03-09-2491",
           })
           .then((data) => data[0]);
-        console.log(photoURL);
 
-        unlinkFile(photoPath);
+        await unlinkFile(`${process.cwd()}/photos/${name}`);
       }
+
+      console.log(elems);
 
       const id = uuid();
       const post = {
         id: id,
-        title: title ? title : "",
-        text: text ? text : "",
-        image: photoURL,
+        title: title,
+        elements: [...elems],
         publisherPhoto: user[0].photo,
         publisherUsername: user[0].username,
         comments: [],
         commentsCounter: 0,
+        date: date,
       };
-      console.log(post);
+
       postsRef.doc(id).set(post);
 
-      // const payload: Payload = decode(accessToken);
-      // const userId: number = data.users.findIndex((user) => user.username === payload.username);
-      // const img = file ? file.filename : "";
-      // const post = {
-      //   id: data.posts.length,
-      //   title: title,
-      //   text: text,
-      //   image: img,
-      //   publisherPhoto: data.users[userId].photo,
-      //   publisherUsername: data.users[userId].username,
-      //   comments: [],
-      //   commentsCounter: 0,
-      // };
-      // data.posts.push(post);
-      // await writeFile("src/database/database.json", JSON.stringify(data));
-
-      return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post } };
+      return { isPostCreated: true, accessToken: user[0].accessToken, postId: id };
     }
-    return { isPostCreated: false, accessToken: "", post: {} };
+
+    return { isPostCreated: false, accessToken: "", postId: "" };
   };
 
   getPosts = async () => {
     const postsRef = database.collection("posts");
     const posts = (await postsRef.get()).docs.map((post) => post.data());
 
-    // const db = (await readFile("src/database/database.json")) as string;
-    // let data: Data = JSON.parse(db);
-
     return posts;
+  };
+
+  getPost = async (id: string) => {
+    const postsRef = database.collection("posts");
+    const post = (await postsRef.doc(id).get()).data();
+
+    return { ...post };
   };
 
   createComment = async ({
@@ -120,8 +163,6 @@ class PostService {
     accessToken: string | undefined;
     post: Post | {};
   }> => {
-    // const db = (await readFile("src/database/database.json")) as string;
-    // let data: Data = JSON.parse(db);
     const postsRef = database.collection("posts");
     const usersRef = database.collection("users");
 
@@ -130,11 +171,10 @@ class PostService {
     if (isAccessVerified) {
       const payload: Payload = decode(accessToken);
       const post = (await postsRef.where("id", "==", postId).get()).docs.map((post) => post.data()) as Post[];
-      //const postIdInner = data.posts.findIndex((post) => post.id === postId);
+
       const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
         user.data()
       ) as User[];
-      //const userId = data.users.findIndex((user) => user.username === payload.username);
 
       const comment = {
         id: post[0].commentsCounter,
@@ -152,8 +192,6 @@ class PostService {
       post[0].commentsCounter += 1;
 
       await postsRef.doc(post[0].id).set({ ...post[0] });
-
-      //await writeFile("src/database/database.json", JSON.stringify(data));
 
       return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post[0] } };
     }

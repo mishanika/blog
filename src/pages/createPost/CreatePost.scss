@@ -1,0 +1,126 @@
+@mixin animate($animation, $duration, $method, $times) {
+  animation: $animation $duration $method $times;
+}
+@mixin keyframes($name) {
+  @keyframes #{$name} {
+    @content;
+  }
+}
+
+.create-post-wrapper {
+  width: 100%;
+  height: 100%;
+
+  .create-post {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    // flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 25px;
+    //margin: 100px 0 0 0;
+    box-sizing: border-box;
+    //overflow: hidden;
+  }
+
+  .title {
+    font-size: 3rem;
+    font-weight: 600;
+  }
+
+  .post-proto {
+    width: 740px;
+    height: calc(90% - 100px);
+    background: #fff;
+    color: #000;
+    border-right: 1px solid #fff;
+    border-left: 1px solid #fff;
+    padding: 10px 20px;
+    // margin: 0 0 100px 0;
+    overflow: auto;
+
+    & > * {
+      margin: 15px 0 0 0;
+    }
+  }
+
+  .create-post-btn {
+    border: 1px solid #fff;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+    border-radius: 1rem;
+    padding: 5px 10px;
+    font-size: 1.5rem;
+    font-weight: 500;
+    overflow: hidden;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .block-to-move {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #ce1f54;
+    padding: 5px;
+    transform: translateX(-100%);
+    z-index: 0;
+  }
+
+  .create-post-btn:hover > span {
+    z-index: 1;
+  }
+
+  .space-eater {
+  }
+
+  .create-post-btn:hover .block-to-move {
+    @include keyframes(scrollRightToLeft) {
+      0% {
+        transform: translateX(-100%);
+      }
+      20% {
+        transform: translateX(0);
+      }
+      40% {
+        transform: translateX(200%);
+      }
+      60% {
+        transform: translateY(200%);
+      }
+      80% {
+        transform: translateX(-200%);
+      }
+      100% {
+        transform: translateY(0);
+        transform: translateX(-100%);
+      }
+    }
+
+    @include animate(scrollRightToLeft, 4s, linear, infinite);
+  }
+
+  .create-post-btn:hover > span {
+    @include keyframes(scrollRightToLeftText) {
+      0% {
+        color: #000;
+      }
+      20% {
+        color: #fff;
+      }
+      40% {
+        color: #000;
+      }
+      100% {
+        color: #000;
+      }
+    }
+
+    @include animate(scrollRightToLeftText, 4s, linear, infinite);
+  }
+}
