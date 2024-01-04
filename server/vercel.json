@@ -1,3 +1,4 @@
 {
+  "include": ["photos"],
   "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }
