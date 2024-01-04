@@ -1,6 +1,6 @@
 import cors from "cors";
 import express from "express";
-import router from "./routes/index";
+import router from "./src/routes/index";
 
 const app = express();
 const port = 3030;
