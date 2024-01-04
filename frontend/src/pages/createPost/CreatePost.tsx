@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import CreatePostMenu from "../../components/createPostMenu/CreatePostMenu";
 import "./CreatePost.scss";
 import { useNavigate } from "react-router-dom";
-import { renderCreate } from "../../utils/utils";
+import { renderCreate, url } from "../../utils/utils";
 
 export type PostElement = {
   element: string;
@@ -30,7 +30,7 @@ const CreatePost = () => {
       accessToken: localStorage.getItem("accessToken"),
       date: Date.now(),
     };
-    fetch("http://localhost:3030/post/create", {
+    fetch(`${url}/post/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",

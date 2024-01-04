@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import "./ProfilePopup.scss";
 import { ProfileInfo } from "../../pages/profile/Profile";
+import { url } from "../../utils/utils";
 
 type PopupProps = {
   photo: string;
@@ -61,7 +62,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
       }
       console.log(formRef.current);
 
-      fetch("http://localhost:3030/user/edit", {
+      fetch(`${url}/user/edit`, {
         method: "POST",
 
         body: form,

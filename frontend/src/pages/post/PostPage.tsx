@@ -5,7 +5,7 @@ import { CommentType } from "../blog/Blog";
 import Comment from "../../components/comment/Comment";
 import { PostContext } from "../../utils/context";
 import CommentCreate from "../../components/commentWrite/CommentCreate";
-import { renderPost } from "../../utils/utils";
+import { renderPost, url } from "../../utils/utils";
 import { PostElement } from "../createPost/CreatePost";
 
 type Post = {
@@ -47,7 +47,7 @@ const PostPage: React.FC = () => {
         navigate("/login");
         return;
       }
-      fetch(`http://localhost:3030/post/${id}`)
+      fetch(`${url}/post/${id}`)
         .then((data) => data.json())
         .then((data) => {
           setPost(data.post);

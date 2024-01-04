@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.scss";
 import Eye from "../../assets/svg/Eye";
+import { url } from "../../utils/utils";
 
 type Data = {
   username: string;
@@ -61,7 +62,7 @@ const Register: React.FC = () => {
       repeatedPassword: data.repeatedPassword,
     };
 
-    const response = await fetch("http://localhost:3030/user/register", {
+    const response = await fetch(`${url}/user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
