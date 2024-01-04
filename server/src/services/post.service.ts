@@ -87,13 +87,15 @@ class PostService {
 
     const isAccessVerified = await verify(accessToken);
 
+    console.log(isAccessVerified);
     if (isAccessVerified) {
       const payload: Payload = decode(accessToken);
       const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
         user.data()
       ) as User[];
 
-      const imgElements = elements.filter((item) => item.element === "img");
+      const imgElements = elems.filter((item) => item.element === "img");
+      console.log(imgElements);
 
       for (let i = 0; i < imgElements.length; i++) {
         let base64Image = imgElements[i].value.split(";base64,").pop();

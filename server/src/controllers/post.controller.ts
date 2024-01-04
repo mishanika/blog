@@ -9,6 +9,8 @@ class PostController {
 
   createPost = async (req: Request, res: Response) => {
     try {
+      console.log(req.body);
+      console.log("========");
       const postCreated = await this.postService.createPost(req.body);
       if (postCreated.isPostCreated) {
         res.status(200).json({ auth: true, accessToken: postCreated.accessToken, postId: postCreated.postId });
@@ -18,7 +20,7 @@ class PostController {
       res.status(400).json({ auth: false, accessToken: "" });
     } catch (err) {
       console.log(err);
-      res.status(500).send("Server Error");
+      res.status(500).send(err);
     }
   };
 
@@ -29,7 +31,7 @@ class PostController {
       res.status(200).json({ posts: [...posts] });
     } catch (err) {
       console.log(err);
-      res.status(500).send("Server Error");
+      res.status(500).send(err);
     }
   };
 

@@ -12,10 +12,7 @@ export type PostElement = {
 const CreatePost = () => {
   const navigate = useNavigate();
   const postRef = useRef<HTMLDivElement>(null);
-  const [elements, setElements] = useState<PostElement[]>([
-    { element: "h1", value: "Title" },
-    { element: "h2", value: "Text" },
-  ]);
+  const [elements, setElements] = useState<PostElement[]>([]);
   const [title, setTitle] = useState("Your Title supposed to be here");
   const [active, setActive] = useState(-1);
 
@@ -30,6 +27,24 @@ const CreatePost = () => {
       accessToken: localStorage.getItem("accessToken"),
       date: Date.now(),
     };
+    //     const form = new FormData();
+
+    //     for (const [key, value] of Object.entries(data)) {
+    //  form.append()
+    // }
+    //     fetch(`http://localhost:3030/post/create`, {
+    //       method: "POST",
+
+    //       body: data),
+    //     })
+    //       .then((data) => data.json())
+    //       .then((data) => {
+    //         localStorage.setItem("accessToken", data.accessToken);
+    //         navigate(`/post/${data.postId}`);
+    //       })
+    //       .catch(() => {
+    //         navigate("/login");
+    //       });
     fetch(`${url}/post/create`, {
       method: "POST",
       headers: {
