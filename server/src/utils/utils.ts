@@ -93,7 +93,7 @@ export const writeFile = (path: string, data: any) => {
 
 export const uploadFile = (name: string, data: string) => {
   return new Promise((resolve) => {
-    fs.writeFile(`${process.cwd()}/public/photos/${name}`, data, { encoding: "base64" }, resolve);
+    fs.writeFile(`${path.join(process.cwd(), "public", "photos", name)}`, data, { encoding: "base64" }, resolve);
   });
 };
 

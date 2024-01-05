@@ -3,6 +3,7 @@ import { ProfileInfo, User } from "../types";
 import { bucket, database } from "../firebase/firebase";
 import { v4 as uuid } from "uuid";
 import process from "process";
+import path from "path";
 class UserService {
   registerUser = async (username: string, password: string): Promise<boolean> => {
     const usersRef = database.collection("users");
@@ -89,7 +90,7 @@ class UserService {
     const isAccessVerified = await verify(accessToken);
 
     if ((isAccessVerified && username === oldUsername) || (user && secondUser)) {
-      const photoPath = `${process.cwd()}/public/photos/${file?.filename}`;
+      const photoPath = `${path.join(process.cwd(), "public", "photos", file ? file?.filename : "")}`;
 
       if (file) {
         const fileUploadOptions = {
