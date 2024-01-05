@@ -2,6 +2,7 @@ import { Comment, User } from "./../types";
 import fs from "fs";
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { database } from "../firebase/firebase";
+import path from "path";
 
 const SECRET = "VERYSECRETSECRET";
 
@@ -92,7 +93,7 @@ export const writeFile = (path: string, data: any) => {
 
 export const uploadFile = (name: string, data: string) => {
   return new Promise((resolve) => {
-    fs.writeFile(`${process.cwd()}/photos/${name}`, data, { encoding: "base64" }, resolve);
+    fs.writeFile(`${process.cwd()}/public/photos/${name}`, data, { encoding: "base64" }, resolve);
   });
 };
 

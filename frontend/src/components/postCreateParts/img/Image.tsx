@@ -30,7 +30,13 @@ const Image: React.FC<PropsWithChildren & Props> = ({ index, elements, setElemen
         elements[index].value = base64;
         // console.log(elements[index].value);
 
-        setSrc(URL.createObjectURL(e.target.files[0]));
+        // console.log(file.size);
+        // console.log(new Blob([base64]).size);
+        // console.log(await new Blob([base64]).arrayBuffer());
+        // console.log(new Blob([base64]).stream());
+        // console.log(await new Blob([base64]).text());
+
+        setSrc(URL.createObjectURL(file));
         setIsImgPasted(true);
         setElements((prev) => [...prev]);
       }

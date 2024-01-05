@@ -89,7 +89,7 @@ class UserService {
     const isAccessVerified = await verify(accessToken);
 
     if ((isAccessVerified && username === oldUsername) || (user && secondUser)) {
-      const photoPath = `${process.cwd()}/photos/${file?.filename}`;
+      const photoPath = `${process.cwd()}/public/photos/${file?.filename}`;
 
       if (file) {
         const fileUploadOptions = {

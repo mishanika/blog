@@ -106,7 +106,7 @@ class PostService {
 
         await uploadFile(name, base64Image || "");
 
-        await bucket.upload(`${process.cwd()}/photos/${name}`, fileUploadOptions);
+        await bucket.upload(`${process.cwd()}/public/photos/${name}`, fileUploadOptions);
 
         const photoFile = await bucket.getFiles({ prefix: `postPhoto/${name}` });
         imgElements[i].value = await photoFile[0][0]
@@ -116,7 +116,7 @@ class PostService {
           })
           .then((data) => data[0]);
 
-        await unlinkFile(`${process.cwd()}/photos/${name}`);
+        await unlinkFile(`${process.cwd()}/public/photos/${name}`);
       }
 
       console.log(elems);
