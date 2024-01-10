@@ -3,6 +3,7 @@ import { useContext, useRef } from "react";
 import { CommentType as CommentProps } from "../../pages/blog/Blog";
 import { BlogContext, PostContext } from "../../utils/context";
 import { useNavigate } from "react-router-dom";
+import { url } from "../../utils/utils";
 
 type CommentCreateProps = {
   comments: CommentProps[];
@@ -23,7 +24,7 @@ const CommentCreate: React.FC<CommentCreateProps> = ({ comments, commentReplyId 
       commentReplyId: commentReplyId,
     };
 
-    fetch("http://localhost:3030/post/createComment", {
+    fetch(`${url}/post/createComment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",

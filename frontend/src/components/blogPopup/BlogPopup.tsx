@@ -2,6 +2,7 @@ import { useRef } from "react";
 import "./BlogPopup.scss";
 import { PostType } from "../../pages/blog/Blog";
 import { useNavigate } from "react-router-dom";
+import { url } from "../../utils/utils";
 
 type BlogPopupProps = {
   setIsPopupOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,7 +42,7 @@ const BlogPopup: React.FC<BlogPopupProps> = ({ setIsPopupOpen, setPosts }) => {
       }
     }
 
-    fetch("http://localhost:3030/post/create", {
+    fetch(`${url}/post/create`, {
       method: "POST",
 
       body: form,

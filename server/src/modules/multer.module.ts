@@ -3,7 +3,7 @@ import multer from "multer";
 
 export const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "photos/");
+    cb(null, "public/photos/");
   },
   filename: function (req, file, cb) {
     cb(null, crypto.randomUUID() + "." + file.mimetype.split("/")[1]);

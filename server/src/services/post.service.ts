@@ -2,6 +2,7 @@ import { bucket, database } from "../firebase/firebase";
 import { CommentBody, Post, PostBody, User } from "../types";
 import { v4 as uuid } from "uuid";
 import { Payload, addComment, decode, unlinkFile, uploadFile, verify } from "../utils/utils";
+import path from "path";
 
 class PostService {
   // createPost = async (
@@ -87,13 +88,15 @@ class PostService {
 
     const isAccessVerified = await verify(accessToken);
 
+    console.log(isAccessVerified);
     if (isAccessVerified) {
       const payload: Payload = decode(accessToken);
       const user = (await usersRef.where("username", "==", payload.username).get()).docs.map((user) =>
         user.data()
       ) as User[];
 
-      const imgElements = elements.filter((item) => item.element === "img");
+      const imgElements = elems.filter((item) => item.element === "img");
+      console.log(imgElements);
 
       for (let i = 0; i < imgElements.length; i++) {
         let base64Image = imgElements[i].value.split(";base64,").pop();
@@ -104,7 +107,7 @@ class PostService {
 
         await uploadFile(name, base64Image || "");
 
-        await bucket.upload(`${process.cwd()}/photos/${name}`, fileUploadOptions);
+        await bucket.upload(`${path.join(process.cwd(), "public", "photos", name)}`, fileUploadOptions);
 
         const photoFile = await bucket.getFiles({ prefix: `postPhoto/${name}` });
         imgElements[i].value = await photoFile[0][0]
@@ -114,7 +117,7 @@ class PostService {
           })
           .then((data) => data[0]);
 
-        await unlinkFile(`${process.cwd()}/photos/${name}`);
+        await unlinkFile(`${path.join(process.cwd(), "public", "photos", name)}`);
       }
 
       console.log(elems);

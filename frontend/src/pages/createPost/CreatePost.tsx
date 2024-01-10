@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import CreatePostMenu from "../../components/createPostMenu/CreatePostMenu";
 import "./CreatePost.scss";
 import { useNavigate } from "react-router-dom";
-import { renderCreate } from "../../utils/utils";
+import { renderCreate, url } from "../../utils/utils";
 
 export type PostElement = {
   element: string;
@@ -12,10 +12,7 @@ export type PostElement = {
 const CreatePost = () => {
   const navigate = useNavigate();
   const postRef = useRef<HTMLDivElement>(null);
-  const [elements, setElements] = useState<PostElement[]>([
-    { element: "h1", value: "Title" },
-    { element: "h2", value: "Text" },
-  ]);
+  const [elements, setElements] = useState<PostElement[]>([]);
   const [title, setTitle] = useState("Your Title supposed to be here");
   const [active, setActive] = useState(-1);
 
@@ -30,7 +27,25 @@ const CreatePost = () => {
       accessToken: localStorage.getItem("accessToken"),
       date: Date.now(),
     };
-    fetch("http://localhost:3030/post/create", {
+    //     const form = new FormData();
+
+    //     for (const [key, value] of Object.entries(data)) {
+    //  form.append()
+    // }
+    //     fetch(`http://localhost:3030/post/create`, {
+    //       method: "POST",
+
+    //       body: data),
+    //     })
+    //       .then((data) => data.json())
+    //       .then((data) => {
+    //         localStorage.setItem("accessToken", data.accessToken);
+    //         navigate(`/post/${data.postId}`);
+    //       })
+    //       .catch(() => {
+    //         navigate("/login");
+    //       });
+    fetch(`${url}/post/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",

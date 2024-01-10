@@ -1,7 +1,7 @@
 import "./Blog.scss";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../../utils/utils";
+import { auth, url } from "../../utils/utils";
 import Post from "../../components/post/Post";
 import BlogPopup from "../../components/blogPopup/BlogPopup";
 import { BlogContext } from "../../utils/context";
@@ -36,7 +36,7 @@ const Blog = () => {
   useEffect(() => {
     if (isFetching) {
       auth(navigate)
-        .then(() => fetch("http://localhost:3030/post"))
+        .then(() => fetch(`${url}/post`))
         .then((data) => data.json())
         .then((data) => {
           setIsFetching(false);

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./Profile.scss";
 import ProfilePopup from "../../components/profilePopup/ProfilePopup";
+import { url } from "../../utils/utils";
 
 export type ProfileInfo = {
   photo: string;
@@ -30,7 +31,7 @@ const Profile: React.FC = () => {
         navigate("/login");
         return;
       }
-      fetch("http://localhost:3030/user/profile", {
+      fetch(`${url}/user/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json;charset=utf-8",

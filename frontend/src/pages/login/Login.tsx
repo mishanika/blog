@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.scss";
+import { url } from "../../utils/utils";
 
 type Data = {
   username: string;
@@ -25,7 +26,7 @@ const Login: React.FC = () => {
       password: data.password,
     };
 
-    const response = await fetch("http://localhost:3030/user/login", {
+    const response = await fetch(`${url}/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json;charset=utf-8",
