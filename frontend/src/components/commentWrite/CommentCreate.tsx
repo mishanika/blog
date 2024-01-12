@@ -18,33 +18,37 @@ const CommentCreate: React.FC<CommentCreateProps> = ({ comments, commentReplyId 
 
   const createComment = () => {
     const data = {
+      type: "message",
       text: textRef.current?.value,
       accessToken: localStorage.getItem("accessToken"),
       postId: postContext?.postId,
       commentReplyId: commentReplyId,
     };
 
-    fetch(`${url}/post/createComment`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json;charset=utf-8",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((data) => data.json())
-      .then((data) => {
-        data.auth ? localStorage.setItem("accessToken", data.accessToken) : navigate("/login");
-        if (!data.auth) {
-          localStorage.removeItem("username");
-        }
-        const postId = blogContext?.posts.findIndex((post) => post.id === data.post.id);
-        console.log(postId, data.post.id);
-        if (postId !== undefined && postId !== -1) {
-          blogContext!.posts[postId].comments = data.post.comments;
-          console.log(blogContext?.posts);
-        }
-        blogContext?.setPosts((prev) => [...prev]);
-      });
+    if (textRef.current?.value.length) {
+      postContext?.socket?.send(JSON.stringify(data));
+    }
+    // fetch(`${url}/post/createComment`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json;charset=utf-8",
+    //   },
+    //   body: JSON.stringify(data),
+    // })
+    //   .then((data) => data.json())
+    //   .then((data) => {
+    //     data.auth ? localStorage.setItem("accessToken", data.accessToken) : navigate("/login");
+    //     if (!data.auth) {
+    //       localStorage.removeItem("username");
+    //     }
+    //     const postId = blogContext?.posts.findIndex((post) => post.id === data.post.id);
+    //     console.log(postId, data.post.id);
+    //     if (postId !== undefined && postId !== -1) {
+    //       blogContext!.posts[postId].comments = data.post.comments;
+    //       console.log(blogContext?.posts);
+    //     }
+    //     blogContext?.setPosts((prev) => [...prev]);
+    //   });
   };
 
   return (

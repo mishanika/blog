@@ -32,9 +32,68 @@ const PostPage: React.FC = () => {
   });
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
-  const [isCommentCreateOpen, setIsCommentCreateOpen] = useState<boolean>(false);
+  const [isCommentCreateOpen, setIsCommentCreateOpen] = useState<{ isOpen: boolean; id: null | number }>({
+    isOpen: false,
+    id: null,
+  });
+  const [socket, setSocket] = useState<WebSocket>();
 
   const commentsRender = (item: CommentType) => <Comment {...item} />;
+
+  useEffect(() => {
+    setSocket(new WebSocket("ws://localhost:3333"));
+  }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.onopen = () => {
+        const data = {
+          type: "connect",
+          postId: id,
+        };
+        socket.send(JSON.stringify(data));
+      };
+
+      socket.onmessage = (mes) => {
+        console.log(mes.data);
+        const { type, text, postResponse, auth, accessToken, isSender } = JSON.parse(mes.data);
+
+        switch (type) {
+          case "message":
+            if (isSender) {
+              auth ? localStorage.setItem("accessToken", accessToken) : navigate("/login");
+              if (!auth) {
+                localStorage.removeItem("username");
+              }
+            }
+
+            setIsCommentCreateOpen((prev) => ({ ...prev, isOpen: false }));
+            setPost({ ...postResponse });
+
+            break;
+
+          case "error":
+            alert(text);
+        }
+      };
+
+      socket.onclose = () => {
+        const data = {
+          type: "disconnect",
+          postId: id,
+        };
+        socket.send(JSON.stringify(data));
+      };
+    }
+
+    return () => {
+      if (socket) {
+        socket.onmessage = null;
+        socket.onopen = null;
+        socket.onclose = null;
+      }
+    };
+  }, [socket]);
 
   useEffect(() => {
     setIsFetching(true);
@@ -70,13 +129,20 @@ const PostPage: React.FC = () => {
             </Link>
           </div>
           <div className="elements">{post.elements.map(renderPost)}</div>
-          <PostContext.Provider value={{ postId: id || "" }}>
+          <PostContext.Provider
+            value={{
+              postId: id || "",
+              socket: socket || null,
+              isCommentCreateOpen: isCommentCreateOpen,
+              setIsCommentCreateOpen: setIsCommentCreateOpen,
+            }}
+          >
             <div className="comments-wrapper">
               <span
                 className="close-open-comments"
                 onClick={() => {
                   setIsCommentsOpen((prev) => !prev);
-                  setIsCommentCreateOpen(false);
+                  setIsCommentCreateOpen((prev) => ({ ...prev, isOpen: false }));
                 }}
               >
                 {!isCommentsOpen ? "Open" : "Close"} comments
@@ -84,11 +150,18 @@ const PostPage: React.FC = () => {
               {!isCommentsOpen ? (
                 false
               ) : (
-                <div className="create" onClick={() => setIsCommentCreateOpen((prev) => !prev)}>
+                <div
+                  className="create"
+                  onClick={() => setIsCommentCreateOpen((prev) => ({ ...prev, isOpen: !prev.isOpen }))}
+                >
                   Comment
                 </div>
               )}
-              {isCommentCreateOpen ? <CommentCreate comments={post.comments || []} commentReplyId={null} /> : false}
+              {isCommentCreateOpen.isOpen && isCommentCreateOpen.id === null ? (
+                <CommentCreate comments={post.comments || []} commentReplyId={null} />
+              ) : (
+                false
+              )}
               {!isCommentsOpen ? false : post.comments && post.comments.map(commentsRender)}
             </div>
           </PostContext.Provider>

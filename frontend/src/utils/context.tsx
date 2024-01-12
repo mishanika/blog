@@ -9,5 +9,16 @@ export interface IBlogContext {
   setPosts: React.Dispatch<React.SetStateAction<PostType[]>>;
 }
 export interface IPostContext {
+  socket: WebSocket | null;
   postId: string;
+  setIsCommentCreateOpen: React.Dispatch<
+    React.SetStateAction<{
+      isOpen: boolean;
+      id: null | number;
+    }>
+  >;
+  isCommentCreateOpen: {
+    isOpen: boolean;
+    id: null | number;
+  };
 }

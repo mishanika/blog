@@ -1,7 +1,10 @@
+import { WebSocket } from "ws";
+
 export type Data = {
   users: User[];
   posts: Post[];
 };
+
 export type User = {
   id: string;
   photo: string;
@@ -13,22 +16,27 @@ export type User = {
   accessToken: string | undefined;
   refreshToken: string | undefined;
 };
+
 export type RegisterBody = {
   username: string;
   password: string;
   repeatedPassword: string;
 };
+
 export type LoginBody = {
   username: string;
   password: string;
 };
+
 export type AuthBody = {
   accessToken: string;
 };
+
 export type ProfileBody = {
   username: string;
   token: string;
 };
+
 export type ProfileInfo = {
   photo: string;
   username: string;
@@ -37,6 +45,7 @@ export type ProfileInfo = {
   description: string;
   myUsername: string;
 };
+
 export type EditBody = {
   username: string;
   name: string;
@@ -45,6 +54,7 @@ export type EditBody = {
   oldUsername: string;
   accessToken: string;
 };
+
 export type Post = {
   id: string;
   title: string;
@@ -55,12 +65,14 @@ export type Post = {
   comments: Comment[];
   commentsCounter: number;
 };
+
 export type PostBody = {
   title: string;
   elements: PostElement[];
   accessToken: string;
   date: number;
 };
+
 export type Comment = {
   id: number;
   publisherPhoto: string;
@@ -68,13 +80,24 @@ export type Comment = {
   text: string;
   replies: Comment[];
 };
+
 export type CommentBody = {
   commentReplyId: number | null;
   text: string;
   accessToken: string;
   postId: number;
 };
+
 export type PostElement = {
   element: string;
   value: string;
+};
+
+export type SocketUser = {
+  userSocket: WebSocket;
+  id: string;
+};
+
+export type PostRooms = {
+  [postId: string]: SocketUser[];
 };

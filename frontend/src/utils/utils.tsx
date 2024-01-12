@@ -11,7 +11,8 @@ import H3 from "../components/postParts/h3/H3";
 import H2 from "../components/postParts/h2/H2";
 import Image from "../components/postParts/img/Image";
 
-export const url = "https://blog-back-delta.vercel.app";
+//export const url = "https://blog-back-delta.vercel.app";
+export const url = "http://localhost:3030";
 
 export const auth = async (navigate: NavigateFunction) => {
   const accessToken = localStorage.getItem("accessToken");
