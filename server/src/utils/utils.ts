@@ -5,6 +5,7 @@ import { database } from "../firebase/firebase";
 import path from "path";
 
 const SECRET = "VERYSECRETSECRET";
+export const url = "http://localhost:3030";
 
 export type Tokens = {
   accessToken: string | undefined;
