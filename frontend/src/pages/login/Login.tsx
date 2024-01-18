@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Login.scss";
-import { url } from "../../utils/utils";
+import { handleClick, url } from "../../utils/utils";
 
-type Data = {
+export type DataLog = {
   username: string;
   password: string;
 };
@@ -11,9 +11,12 @@ type Data = {
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
-  const labelUsernameRef = useRef<HTMLLabelElement>(null);
+  // const labelUsernameRef = useRef<HTMLLabelElement>(null);
 
-  const [data, setData] = useState<Data>({
+  const labelRefs = useRef<Array<HTMLLabelElement | null>>([]);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  const [data, setData] = useState<DataLog>({
     username: "",
     password: "",
   });
@@ -35,8 +38,8 @@ const Login: React.FC = () => {
     });
 
     if (!response.ok) {
-      labelUsernameRef.current!.textContent = "Wrong login or password";
-      labelUsernameRef.current!.style.color = "Red";
+      labelRefs.current[0]!.textContent = "Wrong login or password";
+      labelRefs.current[0]!.style.color = "Red";
       return;
     }
     const { accessToken } = await response.json();
@@ -47,11 +50,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="wrapper">
+    <div className="wrapper" onClick={(e) => handleClick(e, data, inputRefs, labelRefs)}>
       <form className="login-form" onSubmit={(e) => login(e)}>
         <div className="title">Login</div>
         <div className="input-wrapper">
-          <label htmlFor="username" className="username-label" ref={labelUsernameRef}>
+          <label htmlFor="username" className="username-label" ref={(el) => (labelRefs.current[0] = el)}>
             Username
           </label>
           <div>
@@ -60,11 +63,12 @@ const Login: React.FC = () => {
               className="username"
               id="username"
               onChange={(e) => setData((prev) => ({ ...prev, username: e.target.value }))}
+              ref={(el) => (inputRefs.current[0] = el)}
             />
           </div>
         </div>
         <div className="input-wrapper">
-          <label htmlFor="password" className="password-label">
+          <label htmlFor="password" className="password-label" ref={(el) => (labelRefs.current[1] = el)}>
             Password
           </label>
           <div>
@@ -73,6 +77,7 @@ const Login: React.FC = () => {
               className="password"
               id="password"
               onChange={(e) => setData((prev) => ({ ...prev, password: e.target.value }))}
+              ref={(el) => (inputRefs.current[1] = el)}
             />
           </div>
         </div>

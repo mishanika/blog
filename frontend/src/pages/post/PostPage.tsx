@@ -7,6 +7,7 @@ import { PostContext } from "../../utils/context";
 import CommentCreate from "../../components/commentWrite/CommentCreate";
 import { renderPost, url } from "../../utils/utils";
 import { PostElement } from "../createPost/CreatePost";
+import Avatar from "../../components/avatar/Avatar";
 
 type Post = {
   id: string;
@@ -124,7 +125,7 @@ const PostPage: React.FC = () => {
             <Link to={`/profile/${post.publisherUsername}`} className="publisher-wrapper">
               <div className="publisher-name">{post.publisherUsername}</div>
               <div className="publisher-photo">
-                <img src={`${post.publisherPhoto}`} alt="post" className="post-img" />
+                <Avatar photo={post.publisherPhoto} username={post.publisherUsername} className={"post-img"} />
               </div>
             </Link>
           </div>

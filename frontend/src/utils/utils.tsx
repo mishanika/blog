@@ -10,6 +10,8 @@ import Text from "../components/postParts/text/Text";
 import H3 from "../components/postParts/h3/H3";
 import H2 from "../components/postParts/h2/H2";
 import Image from "../components/postParts/img/Image";
+import { DataReg } from "../pages/register/Register";
+import { DataLog } from "../pages/login/Login";
 
 //export const url = "https://blog-back-delta.vercel.app";
 export const url = "http://localhost:3030";
@@ -112,5 +114,35 @@ export const renderPost = ({ element, value }: PostElement) => {
       return <Text value={value} />;
     case "img":
       return <Image value={value} />;
+  }
+};
+
+function isAnDataReg(obj: any): obj is DataReg {
+  return "username" in obj && "password" in obj && "repeatedPassword" in obj;
+}
+
+export const handleClick = (
+  e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  data: DataReg | DataLog,
+  inputRefs: React.MutableRefObject<(HTMLInputElement | null)[]>,
+  labelRefs: React.MutableRefObject<(HTMLLabelElement | null)[]>
+) => {
+  if (e.target instanceof HTMLLabelElement) {
+    return;
+  }
+
+  const target = e.target as HTMLInputElement;
+
+  let counter = 0;
+  for (const key in data) {
+    if (target && target === inputRefs.current[counter]) {
+      labelRefs.current[counter]!.classList.add("active");
+    } else {
+      data[key as keyof (DataReg | DataLog)].length
+        ? labelRefs.current[counter]!.classList.add("active")
+        : labelRefs.current[counter]!.classList.remove("active");
+    }
+
+    counter++;
   }
 };

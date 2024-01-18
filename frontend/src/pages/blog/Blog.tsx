@@ -55,10 +55,15 @@ const Blog = () => {
           {/* {<div className="create" onClick={() => setIsPopupOpen(true)}>
             Create new
           </div>} */}
-          <Link to={`/createPost`} className="create">
-            {" "}
-            Create new
-          </Link>
+          <div className="functions">
+            <div className="search">
+              <input type="text" placeholder="Search by post name" />
+            </div>
+            <Link to={`/createPost`} className="create">
+              {" "}
+              Create new
+            </Link>
+          </div>
           <BlogContext.Provider value={{ setPosts: setPosts, posts: posts }}>
             <div className="posts">{posts?.map(postRender)}</div>
           </BlogContext.Provider>

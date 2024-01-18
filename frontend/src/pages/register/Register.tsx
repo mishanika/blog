@@ -2,9 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Register.scss";
 import Eye from "../../assets/svg/Eye";
-import { url } from "../../utils/utils";
+import { handleClick, url } from "../../utils/utils";
 
-type Data = {
+export type DataReg = {
   username: string;
   password: string;
   repeatedPassword: string;
@@ -15,11 +15,14 @@ const Register: React.FC = () => {
   const passRef = useRef<HTMLInputElement>(null);
   const repeatedPassRef = useRef<HTMLInputElement>(null);
 
-  const labelUsernameRef = useRef<HTMLLabelElement>(null);
-  const labelPassRef = useRef<HTMLLabelElement>(null);
-  const labelRepeatedPassRef = useRef<HTMLLabelElement>(null);
+  // const labelUsernameRef = useRef<HTMLLabelElement>(null);
+  // const labelPassRef = useRef<HTMLLabelElement>(null);
+  // const labelRepeatedPassRef = useRef<HTMLLabelElement>(null);
 
-  const [data, setData] = useState<Data>({
+  const labelRefs = useRef<Array<HTMLLabelElement | null>>([]);
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  const [data, setData] = useState<DataReg>({
     username: "",
     password: "",
     repeatedPassword: "",
@@ -43,13 +46,13 @@ const Register: React.FC = () => {
   const register = async () => {
     let errorFlag = false;
     if (data.password.length < 5) {
-      labelPassRef.current!.textContent = "Password must contain more than 5 characters";
-      labelPassRef.current!.style.color = "Red";
+      labelRefs.current[1]!.textContent = "Password must contain more than 5 characters";
+      labelRefs.current[1]!.style.color = "Red";
       errorFlag = true;
     }
     if (data.password !== data.repeatedPassword) {
-      labelRepeatedPassRef.current!.textContent = "Passwords doesn't match";
-      labelRepeatedPassRef.current!.style.color = "Red";
+      labelRefs.current[2]!.textContent = "Passwords doesn't match";
+      labelRefs.current[2]!.style.color = "Red";
       errorFlag = true;
     }
     if (errorFlag) {
@@ -71,8 +74,8 @@ const Register: React.FC = () => {
     });
 
     if (!response.ok) {
-      labelUsernameRef.current!.textContent = "There is a user with such username";
-      labelUsernameRef.current!.style.color = "Red";
+      labelRefs.current[0]!.textContent = "There is a user with such username";
+      labelRefs.current[0]!.style.color = "Red";
       return;
     }
     navigate("/login");
@@ -90,11 +93,11 @@ const Register: React.FC = () => {
   }, [isFetching]);
 
   return (
-    <div className="wrapper">
+    <div className="wrapper" onClick={(e) => handleClick(e, data, inputRefs, labelRefs)}>
       <form className="register-form" onSubmit={(e) => submitHandler(e)}>
         <div className="title">Register</div>
         <div className="input-wrapper">
-          <label htmlFor="username" className="username-label" ref={labelUsernameRef}>
+          <label htmlFor="username" className="username-label" ref={(el) => (labelRefs.current[0] = el)}>
             Username
           </label>
           <div>
@@ -103,11 +106,12 @@ const Register: React.FC = () => {
               className="username"
               id="username"
               onChange={(e) => setData((prev) => ({ ...prev, username: e.target.value }))}
+              ref={(el) => (inputRefs.current[0] = el)}
             />
           </div>
         </div>
         <div className="input-wrapper">
-          <label htmlFor="password" className="password-label" ref={labelPassRef}>
+          <label htmlFor="password" className="password-label" ref={(el) => (labelRefs.current[1] = el)}>
             Password
           </label>
           <div>
@@ -116,13 +120,13 @@ const Register: React.FC = () => {
               className="password"
               id="password"
               onChange={(e) => setData((prev) => ({ ...prev, password: e.target.value }))}
-              ref={passRef}
+              ref={(el) => (inputRefs.current[1] = el)}
             />
             <Eye showPassword={showPassword} passRef={passRef} />
           </div>
         </div>
         <div className="input-wrapper">
-          <label htmlFor="repeat-password" className="repeat-password-label" ref={labelRepeatedPassRef}>
+          <label htmlFor="repeat-password" className="repeat-password-label" ref={(el) => (labelRefs.current[2] = el)}>
             Repeat password
           </label>
           <div>
@@ -131,7 +135,7 @@ const Register: React.FC = () => {
               className="repeat-password"
               id="repeat-password"
               onChange={(e) => setData((prev) => ({ ...prev, repeatedPassword: e.target.value }))}
-              ref={repeatedPassRef}
+              ref={(el) => (inputRefs.current[2] = el)}
             />
             <Eye showPassword={showPassword} passRef={repeatedPassRef} />
           </div>

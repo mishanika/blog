@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import "./ProfilePopup.scss";
-import { ProfileInfo } from "../../pages/profile/Profile";
+import { Popup, ProfileInfo } from "../../pages/profile/Profile";
 import { url } from "../../utils/utils";
 
 type PopupProps = {
@@ -9,8 +9,8 @@ type PopupProps = {
   name: string;
   status: string;
   description: string;
-  setPopupIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setProfileInfo: React.Dispatch<React.SetStateAction<ProfileInfo | undefined>>;
+  setPopupIsOpen: React.Dispatch<React.SetStateAction<Popup>>;
+  setProfileInfo: React.Dispatch<React.SetStateAction<ProfileInfo>>;
 };
 
 const ProfilePopup: React.FC<PopupProps> = ({
@@ -32,7 +32,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
 
   const close = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (e.target === popupRef.current) {
-      setPopupIsOpen(false);
+      setPopupIsOpen((prev) => ({ ...prev, editPopup: false }));
     }
   };
 
@@ -76,7 +76,7 @@ const ProfilePopup: React.FC<PopupProps> = ({
   };
 
   return (
-    <div className="popup-wrapper" onClick={(e) => close(e)} ref={popupRef}>
+    <div className="popup-wrapper popup" onClick={(e) => close(e)} ref={popupRef}>
       <form className="info" ref={formRef}>
         <div className="photo-wrapper">
           <span>Click to choose a photo or drag and drop it</span>

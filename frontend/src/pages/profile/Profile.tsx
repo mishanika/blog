@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import "./Profile.scss";
 import ProfilePopup from "../../components/profilePopup/ProfilePopup";
 import { url } from "../../utils/utils";
+import ProfileAvatarPopup from "../../components/profileAvatarPopup/ProfileAvatarPopup";
+import Avatar from "../../components/avatar/Avatar";
 
 export type ProfileInfo = {
   photo: string;
@@ -13,15 +15,28 @@ export type ProfileInfo = {
   myUsername: string;
 };
 
+export type Popup = {
+  avatarPopup: boolean;
+  editPopup: boolean;
+};
+
 const Profile: React.FC = () => {
   const navigate = useNavigate();
   const { username } = useParams();
-  const [profileInfo, setProfileInfo] = useState<ProfileInfo>();
-  const [popupIsOpen, setPopupIsOpen] = useState<boolean>(false);
+  const [profileInfo, setProfileInfo] = useState<ProfileInfo>({
+    photo: "",
+    username: "",
+    name: "",
+    status: "",
+    description: "",
+    myUsername: "",
+  });
+  const [popupIsOpen, setPopupIsOpen] = useState<Popup>({ avatarPopup: false, editPopup: false });
   const [isFetching, setIsFetching] = useState<boolean>(false);
 
   useEffect(() => {
     setIsFetching(true);
+    setPopupIsOpen({ avatarPopup: false, editPopup: false });
   }, [username]);
 
   useEffect(() => {
@@ -49,24 +64,26 @@ const Profile: React.FC = () => {
 
   return (
     <>
-      {popupIsOpen && profileInfo ? (
+      {popupIsOpen.editPopup && profileInfo && (
         <ProfilePopup {...profileInfo} setPopupIsOpen={setPopupIsOpen} setProfileInfo={setProfileInfo} />
-      ) : (
-        false
       )}
+      {popupIsOpen.avatarPopup && profileInfo && profileInfo.photo.length ? (
+        <ProfileAvatarPopup photo={profileInfo.photo} username={profileInfo.username} setPopupIsOpen={setPopupIsOpen} />
+      ) : null}
+
       <div className="profile-wrapper">
         <div className="photo-info-wrapper">
-          <div className="photo">
-            <img src={profileInfo?.photo} alt="" />
+          <div className="photo" onClick={() => setPopupIsOpen((prev) => ({ ...prev, avatarPopup: true }))}>
+            <Avatar photo={profileInfo.photo} username={profileInfo.username} className={"profile-photo"} />
           </div>
           <div className="info">
-            <div className="username">{profileInfo?.username}</div>
-            <div className="name">{profileInfo?.name}</div>
-            <div className="status">{profileInfo?.status}</div>
-            <div className="description">{profileInfo?.description}</div>
+            <div className="username">{profileInfo.username}</div>
+            <div className="name">{profileInfo.name}</div>
+            <div className="status">{profileInfo.status}</div>
+            <div className="description">{profileInfo.description}</div>
           </div>
           {username === localStorage.getItem("username") ? (
-            <div className="edit" onClick={() => setPopupIsOpen(true)}>
+            <div className="edit" onClick={() => setPopupIsOpen((prev) => ({ ...prev, editPopup: true }))}>
               Edit
             </div>
           ) : null}

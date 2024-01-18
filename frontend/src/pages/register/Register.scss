@@ -54,6 +54,14 @@
     display: block;
     transform: translateY(calc(15px + 28px));
   }
+  & label {
+    width: 90%;
+    transform: translateY(100%);
+    transition: all ease 0.3s;
+  }
+  .active {
+    transform: translateY(0);
+  }
 }
 .submit {
   width: 100%;
