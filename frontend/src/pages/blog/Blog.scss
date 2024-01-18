@@ -18,6 +18,11 @@
   flex-direction: column;
   gap: 25px;
 
+  .functions {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .create {
     align-self: flex-end;
     width: fit-content;
@@ -28,6 +33,7 @@
     cursor: pointer;
     margin: 0 0 10px 0;
   }
+
   .posts {
     display: flex;
     flex-direction: column;

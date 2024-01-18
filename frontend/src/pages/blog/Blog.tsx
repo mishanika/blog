@@ -5,6 +5,7 @@ import { auth, url } from "../../utils/utils";
 import Post from "../../components/post/Post";
 import BlogPopup from "../../components/blogPopup/BlogPopup";
 import { BlogContext } from "../../utils/context";
+import SearchBar from "../../components/searchBar/SearchBar";
 
 export type PostType = {
   id: number;
@@ -56,9 +57,8 @@ const Blog = () => {
             Create new
           </div>} */}
           <div className="functions">
-            <div className="search">
-              <input type="text" placeholder="Search by post name" />
-            </div>
+            <SearchBar />
+
             <Link to={`/createPost`} className="create">
               {" "}
               Create new
