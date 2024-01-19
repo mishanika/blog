@@ -123,6 +123,12 @@ class PostService {
 
       console.log(elems);
 
+      const trigram = title
+        .split("")
+        .map((item, i) => (i < title.length - 2 ? title.slice(i, i + 3).toLowerCase() : ""));
+
+      trigram.splice(title.length - 2, title.length - 1);
+
       const id = uuid();
       const post = {
         id: id,
@@ -134,6 +140,7 @@ class PostService {
         commentsCounter: 0,
         date: date,
         tags: [...tags],
+        trigram: trigram,
       };
 
       postsRef.doc(id).set(post);
@@ -201,6 +208,19 @@ class PostService {
       return { isPostCreated: true, accessToken: user[0].accessToken, post: { ...post[0] } };
     }
     return { isPostCreated: false, accessToken: "", post: {} };
+  };
+
+  searchPosts = async (searchText: string) => {
+    const postsRef = database.collection("posts");
+
+    const trigram = searchText
+      .split("")
+      .map((item, i) => (i < searchText.length - 2 ? searchText.slice(i, i + 3).toLowerCase() : ""));
+
+    const query = await postsRef.where("trigram", "array-contains-any", trigram).get();
+    const post = query.docs.map((doc) => doc.data());
+
+    return [...post];
   };
 }
 

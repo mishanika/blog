@@ -155,7 +155,7 @@ const PostPage: React.FC = () => {
                   className="create"
                   onClick={() => setIsCommentCreateOpen((prev) => ({ ...prev, isOpen: !prev.isOpen }))}
                 >
-                  Comment
+                  Leave a comment
                 </div>
               )}
               {isCommentCreateOpen.isOpen && isCommentCreateOpen.id === null ? (

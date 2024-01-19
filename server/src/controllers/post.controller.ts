@@ -61,6 +61,18 @@ class PostController {
       res.status(500).send("Server Error");
     }
   };
+
+  searchPosts = async (req: Request, res: Response) => {
+    try {
+      const { searchText } = req.body;
+      const posts = await this.postService.searchPosts(searchText);
+
+      res.status(200).json({ posts: [...posts] });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Server Error");
+    }
+  };
 }
 
 export default PostController;

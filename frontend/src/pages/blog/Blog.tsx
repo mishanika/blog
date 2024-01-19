@@ -58,7 +58,7 @@ const Blog = () => {
             Create new
           </div>} */}
           <div className="functions">
-            <SearchBar />
+            <SearchBar setPosts={setPosts} />
 
             <Link to={`/createPost`} className="create">
               {" "}

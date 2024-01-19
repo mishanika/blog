@@ -15,6 +15,7 @@ class PostRouter {
     router.route("/").get(this.postController.getPosts);
     router.route("/:id").get(this.postController.getPost);
     router.route("/createComment").post(this.postController.createComment);
+    router.route("/search").post(this.postController.searchPosts);
 
     return router;
   }
