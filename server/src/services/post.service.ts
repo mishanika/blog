@@ -77,6 +77,7 @@ class PostService {
     elements,
     accessToken,
     date,
+    tags,
   }: PostBody): Promise<{
     isPostCreated: boolean;
     accessToken: string | undefined;
@@ -132,6 +133,7 @@ class PostService {
         comments: [],
         commentsCounter: 0,
         date: date,
+        tags: [...tags],
       };
 
       postsRef.doc(id).set(post);

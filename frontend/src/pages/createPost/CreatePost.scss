@@ -46,7 +46,13 @@
     }
   }
 
-  .create-post-btn {
+  .create-post > .btns {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .create-post-btn,
+  .add-tags-btn {
     border: 1px solid #fff;
     background: #fff;
     color: #000;
@@ -56,11 +62,17 @@
     font-size: 1.5rem;
     font-weight: 500;
     overflow: hidden;
+    transition: 0.3s all ease;
 
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  .add-tags-btn:hover {
+    background: #ce1f54;
+    color: #fff;
   }
 
   .block-to-move {
@@ -75,9 +87,6 @@
 
   .create-post-btn:hover > span {
     z-index: 1;
-  }
-
-  .space-eater {
   }
 
   .create-post-btn:hover .block-to-move {

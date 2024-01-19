@@ -15,6 +15,7 @@ export type PostType = {
   publisherPhoto: string;
   publisherUsername: string;
   comments: CommentType[];
+  tags: string[];
 };
 export type CommentType = {
   id: number;

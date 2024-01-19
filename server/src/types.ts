@@ -71,6 +71,7 @@ export type PostBody = {
   elements: PostElement[];
   accessToken: string;
   date: number;
+  tags: string[];
 };
 
 export type Comment = {

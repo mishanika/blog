@@ -3,6 +3,7 @@ import CreatePostMenu from "../../components/createPostMenu/CreatePostMenu";
 import "./CreatePost.scss";
 import { useNavigate } from "react-router-dom";
 import { renderCreate, url } from "../../utils/utils";
+import TagsPopup from "../../components/TagsPopup/TagsPopup";
 
 export type PostElement = {
   element: string;
@@ -15,6 +16,8 @@ const CreatePost = () => {
   const [elements, setElements] = useState<PostElement[]>([]);
   const [title, setTitle] = useState("Your Title supposed to be here");
   const [active, setActive] = useState(-1);
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [tags, setTags] = useState<string[]>([]);
 
   const setActivehandler = (index: number) => {
     setActive(index);
@@ -26,6 +29,7 @@ const CreatePost = () => {
       elements: [...elements],
       accessToken: localStorage.getItem("accessToken"),
       date: Date.now(),
+      tags: [...tags],
     };
     //     const form = new FormData();
 
@@ -66,6 +70,7 @@ const CreatePost = () => {
 
   return (
     <>
+      {isTagsOpen ? <TagsPopup setPopupIsOpen={setIsTagsOpen} setTags={setTags} tags={tags} /> : null}
       <div className="create-post-wrapper" ref={postRef}>
         <div className="create-post">
           <CreatePostMenu setElements={setElements} />
@@ -73,9 +78,14 @@ const CreatePost = () => {
             <input type="text" className="title" value={title} onChange={(e) => setTitle(e.target.value)} />
             {elements.map(renderElementsCreate)}
           </div>
-          <div className="create-post-btn" onClick={() => createPost()}>
-            <div className="block-to-move"></div>
-            <span>Create post</span>
+          <div className="btns">
+            <div className="create-post-btn" onClick={() => createPost()}>
+              <div className="block-to-move"></div>
+              <span>Create post</span>
+            </div>
+            <div className="add-tags-btn" onClick={() => setIsTagsOpen(true)}>
+              Add Tags
+            </div>
           </div>
         </div>
       </div>

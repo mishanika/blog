@@ -3,7 +3,9 @@ import { PostType as PostProps } from "../../pages/blog/Blog";
 import { Link } from "react-router-dom";
 import Avatar from "../avatar/Avatar";
 
-const Post: React.FC<PostProps> = ({ id, title, publisherPhoto, publisherUsername }) => {
+const Post: React.FC<PostProps> = ({ id, title, publisherPhoto, publisherUsername, tags }) => {
+  const tagsRender = (item: string) => <div className="tag">{item}</div>;
+
   return (
     <div className="post">
       <div className="post-top">
@@ -20,6 +22,7 @@ const Post: React.FC<PostProps> = ({ id, title, publisherPhoto, publisherUsernam
           </div>
         </Link>
       </div>
+      <div className="tags">{tags?.map(tagsRender)}</div>
     </div>
   );
 };
