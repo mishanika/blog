@@ -64,6 +64,8 @@ export type Post = {
   publisherUsername: string;
   comments: Comment[];
   commentsCounter: number;
+  likedBy: string[];
+  dislikedBy: string[];
 };
 
 export type PostBody = {

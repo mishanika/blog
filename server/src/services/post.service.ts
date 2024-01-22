@@ -3,6 +3,7 @@ import { CommentBody, Post, PostBody, User } from "../types";
 import { v4 as uuid } from "uuid";
 import { Payload, addComment, decode, unlinkFile, uploadFile, verify } from "../utils/utils";
 import path from "path";
+import { firestore } from "firebase-admin";
 
 class PostService {
   // createPost = async (
@@ -141,6 +142,9 @@ class PostService {
         date: date,
         tags: [...tags],
         trigram: trigram,
+        rating: 0,
+        likedBy: [],
+        dislikedBy: [],
       };
 
       postsRef.doc(id).set(post);
@@ -157,12 +161,18 @@ class PostService {
 
     return posts;
   };
-
-  getPost = async (id: string) => {
+  //delete unnecessary props
+  getPost = async (id: string, accessToken: string) => {
+    console.log(id);
     const postsRef = database.collection("posts");
-    const post = (await postsRef.doc(id).get()).data();
+    const post = (await postsRef.doc(id).get()).data() as Post;
+    const payload: Payload = decode(accessToken);
 
-    return { ...post };
+    return {
+      ...post,
+      likedByYou: post.likedBy.find((id) => id === payload.id) ? true : false,
+      dislikedByYou: post.dislikedBy.find((id) => id === payload.id) ? true : false,
+    };
   };
 
   createComment = async ({
@@ -221,6 +231,73 @@ class PostService {
     const post = query.docs.map((doc) => doc.data());
 
     return [...post];
+  };
+
+  ratingHandle = async (postId: string, accessToken: string, type: string) => {
+    const postsRef = database.collection("posts");
+    const usersRef = database.collection("users");
+
+    const isAccessVerified = await verify(accessToken);
+
+    if (isAccessVerified) {
+      const payload: Payload = decode(accessToken);
+      const doc = (await postsRef.doc(postId).get()).data() as Post;
+
+      const liked = doc.likedBy.find((id) => id === payload.id);
+      const disliked = doc.dislikedBy.find((id) => id === payload.id);
+
+      if (type === "inc") {
+        await usersRef.doc(payload.id).update({
+          likedPosts: firestore.FieldValue.arrayUnion(postId),
+        });
+
+        if (disliked || (!liked && !disliked)) {
+          await postsRef.doc(postId).update({
+            rating: firestore.FieldValue.increment(disliked ? 2 : 1),
+            likedBy: firestore.FieldValue.arrayUnion(payload.id),
+            dislikedBy: firestore.FieldValue.arrayRemove(payload.id),
+          });
+        } else if (liked) {
+          await postsRef.doc(postId).update({
+            rating: firestore.FieldValue.increment(-1),
+            likedBy: firestore.FieldValue.arrayRemove(payload.id),
+          });
+        }
+      } else if (type === "dec") {
+        await usersRef.doc(payload.id).update({
+          likedPosts: firestore.FieldValue.arrayRemove(postId),
+        });
+
+        if (liked || (!liked && !disliked)) {
+          await postsRef.doc(postId).update({
+            rating: firestore.FieldValue.increment(liked ? -2 : -1),
+            likedBy: firestore.FieldValue.arrayRemove(payload.id),
+            dislikedBy: firestore.FieldValue.arrayUnion(payload.id),
+          });
+        } else if (disliked) {
+          await postsRef.doc(postId).update({
+            rating: firestore.FieldValue.increment(1),
+            dislikedBy: firestore.FieldValue.arrayRemove(payload.id),
+          });
+        }
+      } else {
+        return { error: "Bad Request", code: 400 };
+      }
+
+      const post = (await postsRef.doc(postId).get()).data() as Post;
+
+      const deleteProps = ({ likedBy, dislikedBy, ...rest }: Post) => {
+        return { ...rest };
+      };
+      const data = deleteProps(post);
+      post?.likedBy.find((item) => item === payload.id);
+
+      return {
+        ...data,
+        likedByYou: post.likedBy.find((id) => id === payload.id) ? true : false,
+        dislikedByYou: post.dislikedBy.find((id) => id === payload.id) ? true : false,
+      };
+    }
   };
 }
 

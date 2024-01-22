@@ -21,6 +21,7 @@ class UserService {
         description: "",
         accessToken: "",
         refreshToken: "",
+        likedPosts: [],
       });
 
       return true;

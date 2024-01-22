@@ -35,10 +35,11 @@ class PostController {
     }
   };
 
+  //переделать в пост запрос и отправлять аксес
   getPost = async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-      const post = await this.postService.getPost(id);
+      const { id, accessToken } = req.params;
+      const post = await this.postService.getPost(id, accessToken);
 
       res.status(200).json({ post: { ...post } });
     } catch (err) {
@@ -68,6 +69,22 @@ class PostController {
       const posts = await this.postService.searchPosts(searchText);
 
       res.status(200).json({ posts: [...posts] });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Server Error");
+    }
+  };
+
+  ratingHandle = async (req: Request, res: Response) => {
+    try {
+      const { postId, accessToken, type } = req.body;
+      const post = await this.postService.ratingHandle(postId, accessToken, type);
+
+      if (post?.error) {
+        res.status(post.code).send(post?.error);
+      } else {
+        res.status(200).json({ ...post });
+      }
     } catch (err) {
       console.log(err);
       res.status(500).send("Server Error");

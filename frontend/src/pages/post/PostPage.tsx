@@ -17,6 +17,9 @@ type Post = {
   publisherUsername: string;
   comments: CommentType[];
   commentsCounter: number;
+  rating: number;
+  likedByYou: boolean;
+  dislikedByYou: boolean;
 };
 
 const PostPage: React.FC = () => {
@@ -30,6 +33,9 @@ const PostPage: React.FC = () => {
     publisherUsername: "",
     comments: [],
     commentsCounter: 0,
+    rating: 0,
+    likedByYou: false,
+    dislikedByYou: false,
   });
   const [isFetching, setIsFetching] = useState<boolean>(false);
   const [isCommentsOpen, setIsCommentsOpen] = useState<boolean>(false);
@@ -40,6 +46,26 @@ const PostPage: React.FC = () => {
   const [socket, setSocket] = useState<WebSocket>();
 
   const commentsRender = (item: CommentType) => <Comment {...item} />;
+
+  const handleRating = (type: string) => {
+    const data = {
+      postId: post.id,
+      accessToken: localStorage.getItem("accessToken"),
+      type: type,
+    };
+
+    fetch(`${url}/post/ratingHandle`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((data) => data.json())
+      .then((data) => {
+        setPost(data);
+      });
+  };
 
   useEffect(() => {
     setSocket(new WebSocket("ws://localhost:3333"));
@@ -107,7 +133,7 @@ const PostPage: React.FC = () => {
         navigate("/login");
         return;
       }
-      fetch(`${url}/post/${id}`)
+      fetch(`${url}/post/${id}/${token}`)
         .then((data) => data.json())
         .then((data) => {
           setPost(data.post);
@@ -130,6 +156,15 @@ const PostPage: React.FC = () => {
             </Link>
           </div>
           <div className="elements">{post.elements.map(renderPost)}</div>
+          <div className="rating">
+            <div className={`inc-rating ${post.likedByYou ? "liked" : ""}`} onClick={() => handleRating("inc")}>
+              +
+            </div>
+            <div className="rating-number">{post.rating}</div>
+            <div className={`dec-rating ${post.dislikedByYou ? "disliked" : ""}`} onClick={() => handleRating("dec")}>
+              -
+            </div>
+          </div>
           <PostContext.Provider
             value={{
               postId: id || "",

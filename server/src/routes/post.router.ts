@@ -13,9 +13,10 @@ class PostRouter {
     const router = express.Router();
     router.route("/create").post(this.postController.createPost);
     router.route("/").get(this.postController.getPosts);
-    router.route("/:id").get(this.postController.getPost);
+    router.route("/:id/:accessToken").get(this.postController.getPost);
     router.route("/createComment").post(this.postController.createComment);
     router.route("/search").post(this.postController.searchPosts);
+    router.route("/ratingHandle").post(this.postController.ratingHandle);
 
     return router;
   }
