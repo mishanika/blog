@@ -16,6 +16,8 @@ class UserRouter {
     router.route("/auth").post(this.userController.authUser);
     router.route("/profile").post(this.userController.getUserProfile);
     router.route("/edit").post(upload.single("photo"), this.userController.editProfile);
+    router.route("/posts/created/:accessToken/:part").get(this.userController.getCreatedPosts);
+    router.route("/posts/liked/:accessToken/:part").get(this.userController.getLikedPosts);
     return router;
   }
 }

@@ -5,6 +5,8 @@ import ProfilePopup from "../../components/profilePopup/ProfilePopup";
 import { url } from "../../utils/utils";
 import ProfileAvatarPopup from "../../components/profileAvatarPopup/ProfileAvatarPopup";
 import Avatar from "../../components/avatar/Avatar";
+import { PostType } from "../blog/Blog";
+import Post from "../../components/post/Post";
 
 export type ProfileInfo = {
   photo: string;
@@ -32,15 +34,21 @@ const Profile: React.FC = () => {
     myUsername: "",
   });
   const [popupIsOpen, setPopupIsOpen] = useState<Popup>({ avatarPopup: false, editPopup: false });
-  const [isFetching, setIsFetching] = useState<boolean>(false);
+  const [isFetching, setIsFetching] = useState({ profile: false, posts: false });
+  const [postType, setPostType] = useState({ created: true, liked: false });
+  const [createdPosts, setCreatedPosts] = useState<PostType[]>([]);
+  const [likedPosts, setLikedPosts] = useState<PostType[]>([]);
+  const [parts, setParts] = useState({ created: 1, liked: 1 });
+  const [isPartGot, setIsPartGot] = useState({ created: false, liked: false });
+  const [innitialFetch, setInnitialFetch] = useState(true);
 
   useEffect(() => {
-    setIsFetching(true);
+    setIsFetching((prev) => ({ ...prev, profile: true }));
     setPopupIsOpen({ avatarPopup: false, editPopup: false });
   }, [username]);
 
   useEffect(() => {
-    if (isFetching) {
+    if (isFetching.profile) {
       const token = localStorage.getItem("accessToken");
       if (!token) {
         navigate("/login");
@@ -57,10 +65,76 @@ const Profile: React.FC = () => {
         .then((data: ProfileInfo) => {
           localStorage.setItem("username", data.myUsername);
           setProfileInfo(data);
-          setIsFetching(false);
+          setIsFetching((prev) => ({ posts: true, profile: false }));
         });
     }
   }, [username, isFetching]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    if (isFetching.posts) {
+      if (innitialFetch) {
+        fetch(`${url}/user/posts/created/${token}/${parts.created}`)
+          .then((data) => data.json())
+          .then((data) => setCreatedPosts(data.posts))
+          .then(() => setInnitialFetch(false))
+          .then(() => setIsPartGot((prev) => ({ ...prev, created: true })))
+          .then(() => setIsFetching((prev) => ({ ...prev, posts: false })));
+      } else if ((postType.created && !isPartGot.created) || (postType.liked && !isPartGot.liked)) {
+        fetch(
+          `${url}/user/posts/${postType.created ? "created" : "liked"}/${token}/${
+            postType.created ? parts.created : parts.liked
+          }`
+        )
+          .then((data) => data.json())
+          .then((data) =>
+            postType.created
+              ? setCreatedPosts((prev) => [...prev, ...data.posts])
+              : setLikedPosts((prev) => [...prev, ...data.posts])
+          )
+          .then(() => {
+            if (postType.created) {
+              setIsPartGot((prev) => ({ ...prev, created: true }));
+            } else {
+              setIsPartGot((prev) => ({ ...prev, liked: true }));
+            }
+          })
+          .then(() => setIsFetching((prev) => ({ ...prev, posts: false })));
+      }
+    }
+  }, [isFetching]);
+
+  useEffect(() => {
+    if (postType.created) {
+      setIsPartGot((prev) => ({ ...prev, created: false }));
+    } else {
+      setIsPartGot((prev) => ({ ...prev, liked: false }));
+    }
+    setIsFetching((prev) => ({ ...prev, posts: true }));
+  }, [parts]);
+
+  const handleParts = () => {
+    if (postType.created) {
+      setParts((prev) => ({ ...prev, created: prev.created + 1 }));
+    } else {
+      setParts((prev) => ({ ...prev, liked: prev.liked + 1 }));
+    }
+  };
+
+  const handlePostType = (type: string) => {
+    if (type === "created") {
+      setPostType({ created: true, liked: false });
+    } else {
+      setPostType({ created: false, liked: true });
+    }
+    setIsFetching((prev) => ({ ...prev, posts: true }));
+  };
+
+  const postRender = (item: PostType) => <Post {...item} />;
 
   return (
     <>
@@ -87,6 +161,20 @@ const Profile: React.FC = () => {
               Edit
             </div>
           ) : null}
+        </div>
+        <div className="liked-created-wrapper">
+          <div className="labels">
+            <div className={`created ${postType.created ? "active" : ""}`} onClick={() => handlePostType("created")}>
+              Created posts
+            </div>
+            <div className={`liked ${postType.liked ? "active" : ""}`} onClick={() => handlePostType("liked")}>
+              Liked posts
+            </div>
+          </div>
+          <div className="posts">{postType.created ? createdPosts.map(postRender) : likedPosts.map(postRender)}</div>
+          <div className="get-next-part" onClick={() => handleParts()}>
+            Get next posts
+          </div>
         </div>
       </div>
     </>

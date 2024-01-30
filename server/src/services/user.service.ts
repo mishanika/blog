@@ -1,5 +1,5 @@
 import { Tokens, decode, makeTokens, readFile, unlinkFile, verify, writeFile } from "../utils/utils";
-import { ProfileInfo, User } from "../types";
+import { Post, ProfileInfo, User } from "../types";
 import { bucket, database } from "../firebase/firebase";
 import { v4 as uuid } from "uuid";
 import process from "process";
@@ -22,6 +22,7 @@ class UserService {
         accessToken: "",
         refreshToken: "",
         likedPosts: [],
+        createdPosts: [],
       });
 
       return true;
@@ -137,6 +138,73 @@ class UserService {
       return { isUserEdited: true, user: { ...user, refreshToken: "" } };
     }
     return { isUserEdited: false, user: {} };
+  };
+
+  getCreatedPosts = async (accessToken: string, part: string) => {
+    const payload = decode(accessToken);
+    const usersRef = database.collection("users");
+    const postsRef = database.collection("posts");
+    const user = (await usersRef.doc(payload.id).get()).data() as User;
+
+    if (user) {
+      if (Math.ceil(user.likedPosts.length / 6) < parseInt(part)) {
+        return { error: "No more posts", code: 400 };
+      }
+      const min =
+        user.createdPosts.length - 6 * parseInt(part) <= 0 ? 0 : user.createdPosts.length - 6 * parseInt(part);
+      let max = 0;
+      if (min + 5 > user.createdPosts.length - 6 * parseInt(part)) {
+        max = user.createdPosts.length - 6 * (parseInt(part) - 1);
+      } else if (min + 5 >= user.createdPosts.length) {
+        max = user.createdPosts.length;
+      } else {
+        max = min + 5;
+      }
+      console.log(user.likedPosts.length, "----------length----------");
+      console.log(min, "----------min----------");
+      console.log(max, "----------max----------");
+
+      const posts = (await Promise.all(
+        user.createdPosts.splice(min, max).map(async (id, index) => (await postsRef.doc(id).get()).data())
+      )) as Post[];
+
+      return { posts: [...posts].reverse() };
+    }
+    return { error: "No such a user", code: 400 };
+  };
+
+  getLikedPosts = async (accessToken: string, part: string) => {
+    const payload = decode(accessToken);
+    const usersRef = database.collection("users");
+    const postsRef = database.collection("posts");
+    const user = (await usersRef.doc(payload.id).get()).data() as User;
+
+    if (user) {
+      if (Math.ceil(user.likedPosts.length / 6) < parseInt(part)) {
+        return { error: "No more posts", code: 400 };
+      }
+      console.log(user.likedPosts, "----------liked----------");
+      const min = user.likedPosts.length - 6 * parseInt(part) <= 0 ? 0 : user.likedPosts.length - 6 * parseInt(part);
+      let max = 0;
+      if (min + 5 > user.createdPosts.length - 6 * parseInt(part)) {
+        max = user.createdPosts.length - 6 * (parseInt(part) - 1);
+      } else if (min + 5 >= user.createdPosts.length) {
+        max = user.createdPosts.length;
+      } else {
+        max = min + 5;
+      }
+      console.log(user.likedPosts.length, "----------length----------");
+      console.log(min, "----------min----------");
+      console.log(max, "----------max----------");
+      // console.log(user.likedPosts.splice(min, max), "----------вырезка----------");
+
+      const posts = (await Promise.all(
+        user.likedPosts.splice(min, max).map(async (id, index) => (await postsRef.doc(id).get()).data())
+      )) as Post[];
+
+      return { posts: [...posts].reverse() };
+    }
+    return { error: "No such a user", code: 400 };
   };
 }
 

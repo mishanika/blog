@@ -13,6 +13,8 @@ export type User = {
   name: string;
   status: string;
   description: string;
+  createdPosts: string[];
+  likedPosts: string[];
   accessToken: string | undefined;
   refreshToken: string | undefined;
 };

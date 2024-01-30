@@ -22,7 +22,7 @@ const Post: React.FC<PostProps> = ({ id, title, publisherPhoto, publisherUsernam
           </div>
         </Link>
       </div>
-      <div className="tags">{tags?.map(tagsRender)}</div>
+      {tags.length ? <div className="tags">{tags?.map(tagsRender)}</div> : null}
     </div>
   );
 };

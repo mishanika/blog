@@ -10,21 +10,29 @@ class UserController {
   }
 
   registerUser = async (req: Request, res: Response) => {
-    const { username, password }: RegisterBody = req.body;
-    const isRegistered = await this.userService.registerUser(username, password);
-    if (isRegistered) {
-      res.status(200).send("Registered");
-    } else {
+    try {
+      const { username, password }: RegisterBody = req.body;
+      const isRegistered = await this.userService.registerUser(username, password);
+      if (isRegistered) {
+        res.status(200).send("Registered");
+      } else {
+        res.status(400).send("There is a user with such username");
+      }
+    } catch (err) {
       res.status(400).send("There is a user with such username");
     }
   };
 
   loginUser = async (req: Request, res: Response) => {
-    const { username, password }: LoginBody = req.body;
-    const payload = await this.userService.loginUser(username, password);
-    if (payload.isLogin) {
-      res.status(200).json({ accessToken: payload.accessToken, username: payload.username });
-    } else {
+    try {
+      const { username, password }: LoginBody = req.body;
+      const payload = await this.userService.loginUser(username, password);
+      if (payload.isLogin) {
+        res.status(200).json({ accessToken: payload.accessToken, username: payload.username });
+      } else {
+        res.status(400).send("Wrong credentials");
+      }
+    } catch (err) {
       res.status(400).send("Wrong credentials");
     }
   };
@@ -80,6 +88,49 @@ class UserController {
       } else {
         res.status(400).send("This username is taken");
       }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Server Error");
+    }
+  };
+
+  getCreatedPosts = async (req: Request, res: Response) => {
+    try {
+      const { accessToken, part } = req.params;
+
+      const posts = await this.userService.getCreatedPosts(accessToken, part);
+
+      if (!posts?.error) {
+        res.status(200).json({ ...posts });
+
+        return;
+      } else {
+        res.status(posts.code).send(posts.error);
+        return;
+      }
+
+      res.status(400).json({ auth: false, accessToken: "accessToken" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Server Error");
+    }
+  };
+
+  getLikedPosts = async (req: Request, res: Response) => {
+    try {
+      const { accessToken, part } = req.params;
+
+      const posts = await this.userService.getLikedPosts(accessToken, part);
+
+      if (!posts?.error) {
+        res.status(200).json({ ...posts });
+
+        return;
+      } else {
+        res.status(posts.code).send(posts.error);
+        return;
+      }
+      res.status(400).json({ auth: false, accessToken: "accessToken" });
     } catch (err) {
       console.log(err);
       res.status(500).send("Server Error");

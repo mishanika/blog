@@ -149,6 +149,10 @@ class PostService {
 
       postsRef.doc(id).set(post);
 
+      usersRef.doc(payload.id).update({
+        createdPosts: firestore.FieldValue.arrayUnion(id),
+      });
+
       return { isPostCreated: true, accessToken: user[0].accessToken, postId: id };
     }
 
