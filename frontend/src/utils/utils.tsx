@@ -13,8 +13,8 @@ import Image from "../components/postParts/img/Image";
 import { DataReg } from "../pages/register/Register";
 import { DataLog } from "../pages/login/Login";
 
-//export const url = "https://blog-back-delta.vercel.app";
-export const url = "http://localhost:3030";
+export const url = "https://blog-back-delta.vercel.app";
+//export const url = "http://localhost:3030";
 
 export const auth = async (navigate: NavigateFunction) => {
   const accessToken = localStorage.getItem("accessToken");
