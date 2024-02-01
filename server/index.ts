@@ -7,9 +7,9 @@ import { createSocket } from "./src/modules/socket.module";
 const app = express();
 const port = 3030;
 
-// const corsOptions = {
-//   origin: "http://localhost:3000",
-// };
+const corsOptions = {
+  origin: process.env.URL || "http://localhost:3000",
+};
 
 //console.log(process.env);
 app.use(express.static("photos"));
