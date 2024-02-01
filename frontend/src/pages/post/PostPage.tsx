@@ -68,7 +68,7 @@ const PostPage: React.FC = () => {
   };
 
   useEffect(() => {
-    setSocket(new WebSocket("ws://localhost:3333"));
+    setSocket(new WebSocket("ws://blog-back-delta.vercel.app:3333"));
   }, []);
 
   useEffect(() => {
