@@ -101,17 +101,17 @@ class PostService {
       console.log(imgElements);
 
       for (let i = 0; i < imgElements.length; i++) {
-        let base64Image = imgElements[i].value.split(";base64,").pop();
-        const name = `${uuid()}.${imgElements[i].value.split(";base64,")[0].split("/")[1]}`;
-        const fileUploadOptions = {
-          destination: `postPhoto/${name}`,
-        };
+        // let base64Image = imgElements[i].value.split(";base64,").pop();
+        // const name = `${uuid()}.${imgElements[i].value.split(";base64,")[0].split("/")[1]}`;
+        // const fileUploadOptions = {
+        //   destination: `postPhoto/${name}`,
+        // };
 
-        await uploadFile(name, base64Image || "");
+        // await uploadFile(name, base64Image || "");
 
-        await bucket.upload(`${path.join(process.cwd(), "public", "photos", name)}`, fileUploadOptions);
+        // await bucket.upload(`${path.join(process.cwd(), "public", "photos", name)}`, fileUploadOptions);
 
-        const photoFile = await bucket.getFiles({ prefix: `postPhoto/${name}` });
+        const photoFile = await bucket.getFiles({ prefix: `postPhoto/${imgElements[i].value}` });
         imgElements[i].value = await photoFile[0][0]
           .getSignedUrl({
             action: "read",
@@ -119,7 +119,7 @@ class PostService {
           })
           .then((data) => data[0]);
 
-        await unlinkFile(`${path.join(process.cwd(), "public", "photos", name)}`);
+        //await unlinkFile(`${path.join(process.cwd(), "public", "photos", name)}`);
       }
 
       console.log(elems);

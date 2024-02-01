@@ -28,7 +28,7 @@ const Image: React.FC<PropsWithChildren & Props> = ({ index, elements, setElemen
         //ArrayBuffer to string
         //const str = decoder.decode(buffer);
         elements[index].value = base64;
-        // console.log(elements[index].value);
+        //console.log(elements[index].value);
 
         // console.log(file.size);
         // console.log(new Blob([base64]).size);

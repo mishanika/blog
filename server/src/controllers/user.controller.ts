@@ -72,7 +72,7 @@ class UserController {
 
   editProfile = async (req: Request, res: Response) => {
     try {
-      const { username, name, status, description, oldUsername, accessToken }: EditBody = req.body;
+      const { username, name, status, description, oldUsername, accessToken, photo }: EditBody = req.body;
 
       const editedUser = await this.userService.editProfile(
         username,
@@ -81,8 +81,9 @@ class UserController {
         description,
         oldUsername,
         accessToken,
-        req.file
+        photo
       );
+
       if (editedUser.isUserEdited) {
         res.status(200).json({ ...editedUser.user });
       } else {

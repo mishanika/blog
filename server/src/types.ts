@@ -55,6 +55,7 @@ export type EditBody = {
   description: string;
   oldUsername: string;
   accessToken: string;
+  photo: string;
 };
 
 export type Post = {

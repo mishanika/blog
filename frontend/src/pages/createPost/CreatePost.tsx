@@ -4,6 +4,9 @@ import "./CreatePost.scss";
 import { useNavigate } from "react-router-dom";
 import { renderCreate, url } from "../../utils/utils";
 import TagsPopup from "../../components/TagsPopup/TagsPopup";
+import { bucket } from "../../components/firebase/firebase";
+import { v4 as uuid } from "uuid";
+import { ref, uploadBytes } from "firebase/storage";
 
 export type PostElement = {
   element: string;
@@ -23,32 +26,31 @@ const CreatePost = () => {
     setActive(index);
   };
 
-  const createPost = () => {
+  const createPost = async () => {
+    const elemsCopy = [...elements];
+    const imgs = elemsCopy.filter((item) => item.element === "img");
+
+    for (let img of imgs) {
+      const type = img.value.split(";base64,")[0].split(":")[1];
+      const metadata = {
+        contentType: type,
+      };
+      const name = `${uuid()}.${type.split("/")[1]}`;
+      const photoRef = ref(bucket, `postPhoto/${name}`);
+      const blob = await fetch(img.value).then((res) => res.blob());
+
+      await uploadBytes(photoRef, blob, metadata);
+      img.value = name;
+    }
+
     const data = {
       title: title,
-      elements: [...elements],
+      elements: [...elemsCopy],
       accessToken: localStorage.getItem("accessToken"),
       date: Date.now(),
       tags: [...tags],
     };
-    //     const form = new FormData();
 
-    //     for (const [key, value] of Object.entries(data)) {
-    //  form.append()
-    // }
-    //     fetch(`http://localhost:3030/post/create`, {
-    //       method: "POST",
-
-    //       body: data),
-    //     })
-    //       .then((data) => data.json())
-    //       .then((data) => {
-    //         localStorage.setItem("accessToken", data.accessToken);
-    //         navigate(`/post/${data.postId}`);
-    //       })
-    //       .catch(() => {
-    //         navigate("/login");
-    //       });
     fetch(`${url}/post/create`, {
       method: "POST",
       headers: {
@@ -65,6 +67,14 @@ const CreatePost = () => {
         navigate("/login");
       });
   };
+
+  // useEffect(() => {
+  //   const citiesCol = collection(db, "users");
+
+  //   getDocs(citiesCol)
+  //     .then((citySnapshot) => citySnapshot.docs.map((doc) => doc.data()))
+  //     .then(console.log);
+  // }, []);
 
   const renderElementsCreate = renderCreate(active, elements, setActivehandler, setElements);
 

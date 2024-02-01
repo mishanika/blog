@@ -2,6 +2,9 @@ import { useRef } from "react";
 import "./ProfilePopup.scss";
 import { Popup, ProfileInfo } from "../../pages/profile/Profile";
 import { url } from "../../utils/utils";
+import { v4 as uuid } from "uuid";
+import { ref, uploadBytes } from "firebase/storage";
+import { bucket } from "../firebase/firebase";
 
 type PopupProps = {
   photo: string;
@@ -36,36 +39,50 @@ const ProfilePopup: React.FC<PopupProps> = ({
     }
   };
 
-  const edit = () => {
-    const data = {
-      photo: photoRef.current?.files,
-      username: usernameRef.current?.value ? usernameRef.current?.value : username,
-      name: nameRef.current?.value ? nameRef.current?.value : "",
-      status: statusRef.current?.value ? statusRef.current?.value : "",
-      description: descriptionRef.current?.value ? descriptionRef.current?.value : "",
-      oldUsername: username,
-      accessToken: localStorage.getItem("accessToken"),
-    };
+  const edit = async () => {
+    if (photoRef.current?.files) {
+      // const form = new FormData();
 
-    if (formRef.current) {
-      const form = new FormData();
+      // for (const [key, value] of Object.entries(data)) {
+      //   if (value) {
+      //     if (typeof value === "string") {
+      //       form.append(key, value);
 
-      for (const [key, value] of Object.entries(data)) {
-        if (value) {
-          if (typeof value === "string") {
-            form.append(key, value);
+      //       continue;
+      //     }
+      //     form.append(key, value[0]);
+      //   }
+      // }
+      // console.log(formRef.current);
 
-            continue;
-          }
-          form.append(key, value[0]);
-        }
+      const name = `${uuid()}.${photoRef.current?.files[0].type.split("/")[1]}`;
+      const firebaseRef = ref(bucket, `userPhoto/${name}`);
+      const metadata = {
+        contentType: photoRef.current.files[0].type,
+      };
+      console.log(name);
+
+      const isLoaded = await uploadBytes(firebaseRef, photoRef.current?.files[0], metadata);
+
+      if (!isLoaded) {
+        return;
       }
-      console.log(formRef.current);
+      const data = {
+        photo: name ? name : "",
+        username: usernameRef.current?.value ? usernameRef.current?.value : username,
+        name: nameRef.current?.value ? nameRef.current?.value : "",
+        status: statusRef.current?.value ? statusRef.current?.value : "",
+        description: descriptionRef.current?.value ? descriptionRef.current?.value : "",
+        oldUsername: username,
+        accessToken: localStorage.getItem("accessToken"),
+      };
 
       fetch(`${url}/user/edit`, {
         method: "POST",
-
-        body: form,
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(data),
       })
         .then((data) => data.json())
         .then((data) => {

@@ -80,7 +80,7 @@ class UserService {
     description: string,
     oldUsername: string,
     accessToken: string,
-    file: Express.Multer.File | undefined
+    photo: string
   ): Promise<{ user: User | {}; isUserEdited: boolean }> => {
     const decodedToken = decode(accessToken);
     const usersRef = database.collection("users");
@@ -92,15 +92,7 @@ class UserService {
     const isAccessVerified = await verify(accessToken);
 
     if ((isAccessVerified && username === oldUsername) || (user && secondUser)) {
-      const photoPath = `${path.join(process.cwd(), "public", "photos", file ? file?.filename : "")}`;
-
-      if (file) {
-        const fileUploadOptions = {
-          destination: `userPhoto/${file?.filename}`,
-          metadata: {
-            contentType: file?.mimetype,
-          },
-        };
+      if (photo.length) {
         if (user.photo.length) {
           const url = user.photo;
           const regex = /\/([^/?]+)\?/;
@@ -110,9 +102,7 @@ class UserService {
           });
         }
 
-        await bucket.upload(photoPath, fileUploadOptions);
-
-        const photoFile = await bucket.getFiles({ prefix: `userPhoto/${file?.filename}` });
+        const photoFile = await bucket.getFiles({ prefix: `userPhoto/${photo}` });
         const photoURL = await photoFile[0][0]
           .getSignedUrl({
             action: "read",
@@ -122,7 +112,6 @@ class UserService {
         console.log(photoURL);
 
         user.photo = photoURL;
-        unlinkFile(photoPath);
       }
 
       user.username = username && username.length ? username : user.username;
